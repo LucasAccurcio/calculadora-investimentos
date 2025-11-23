@@ -4,7 +4,11 @@
 
 - Expo Router drives navigation with a Stack declared in app/\_layout.tsx; the layout wraps everything in SafeAreaProvider/SafeAreaView, syncs GluestackUIProvider + ThemeProvider to useColorScheme, and registers index plus calculators/cdb, calculators/lci-lca, calculators/tesouro, and modal routes.
 - app/index.tsx now just orchestrates the Home dashboard, composing components/home/\* (header, menu list, subscription banner) with data sourced from app/home/calculators.ts.
-- app/calculators/\* hosts each calculator screen (currently placeholders) that inherit the shared stack; app/modal.tsx stays available for modal flows.
+- app/calculators/ follows a layered structure:
+  - app/calculators/components holds generic building blocks (e.g., CalculatorInput) that every calculator should reuse before creating bespoke widgets.
+  - app/calculators/utils centralizes formatting helpers, CDI fetch/persistence, and product-specific math (cdb-calculations). Keep formulas + parsing logic here so other calculators can import them or add their own modules.
+  - Each product lives in app/calculators/<product>/ with an index.tsx screen, a style.ts file, and an optional components/ subfolder for product-only UI (e.g., CDB’s ProjectionSummary). Route registrations should point to these index files.
+- app/modal.tsx stays available for modal flows.
 - hooks/\* supplies theming helpers (use-color-scheme, use-theme-color); constants/theme.ts stores palette + platform font tokens; scripts/reset-project.js can nuke or archive app/components/hooks/constants/scripts into app-example.
 
 ## Styling & Theming
@@ -23,7 +27,8 @@
 ## Screens & Patterns
 
 - app/index.tsx composes the Home dashboard via `components/home/*`: `home-header.tsx` handles the hero row, `calculator-menu-list.tsx` renders card links, `subscription-banner.tsx` keeps the CTA isolated, and `section-heading.tsx` centralizes typography. Extend `app/home/calculators.ts` when adding flows.
-- app/calculators/\* currently contain ThemedView/Text placeholders; reuse their padding/gap scales when replacing them with real calculators to remain consistent with the Home spacing.
+- Calculator screens should mirror the CDB structure: keep state/logic inside `app/calculators/<product>/index.tsx`, styles in `style.ts`, and break out any product-only visual blocks into `components/` within that folder. Always prefer importing from `app/calculators/components` or `components/ui/*` before creating new UI.
+- Keyboard-aware layouts: wrap forms in `KeyboardAwareScrollView` (react-native-keyboard-aware-scroll-view) with consistent props (extraScrollHeight, enableOnAndroid). Shared inputs should come from `CalculatorInput` to keep clear buttons, typography, and accessibility consistent.
 - components/parallax-scroll-view.tsx depends on react-native-reanimated’s useScrollOffset; keep the top-level import "react-native-reanimated" inside app/\_layout.tsx before using this helper elsewhere.
 
 ## Module resolution & assets

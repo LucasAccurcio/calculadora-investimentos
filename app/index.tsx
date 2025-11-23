@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
-import { CALCULATORS } from '@/app/calculators';
 import { CalculatorMenuList } from '@/components/home/calculator-menu-list';
 import { HomeHeader } from '@/components/home/home-header';
 import { PreferencesAccordion } from '@/components/home/preferences-accordion';
@@ -19,6 +18,7 @@ import {
 } from '@/components/ui/drawer';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
+import { CALCULATORS } from '@/features/home/calculators';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function HomeScreen() {

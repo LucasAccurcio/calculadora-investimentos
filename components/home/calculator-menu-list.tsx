@@ -1,10 +1,10 @@
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet } from 'react-native';
 
-import type { CalculatorMenu } from '@/app/calculators';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
+import type { CalculatorMenu } from '@/features/home/calculators';
 
 type Palette = (typeof import('@/constants/theme').Colors)['light'];
 

@@ -1,10 +1,6 @@
-export type ProjectionInputs = {
-  initial: number;
-  monthly: number;
-  months: number;
-  cdi: number;
-  percent: number;
-};
+import type { CalculatorInputs, CalculatorParsedInputs } from './types';
+
+export type ProjectionInputs = CalculatorInputs;
 
 export type ProjectionResult = {
   net: number;
@@ -14,15 +10,6 @@ export type ProjectionResult = {
   monthlyRate: number;
   taxRate: number;
   taxAmount: number;
-};
-
-export type ParsedInputs = {
-  initial?: number;
-  monthly?: number;
-  months?: number;
-  cdi?: number;
-  percent?: number;
-  final?: number;
 };
 
 export type CalculableField = 'initial' | 'monthly' | 'months' | 'cdi' | 'percent';
@@ -59,7 +46,7 @@ export function getIncomeTaxRate(months: number) {
   return 0.15;
 }
 
-export function solveForMissingField(field: CalculableField, inputs: ParsedInputs) {
+export function solveForMissingField(field: CalculableField, inputs: CalculatorParsedInputs) {
   switch (field) {
     case 'initial':
       return solveInitial(inputs);
@@ -112,7 +99,7 @@ export function computeMonthlyRate(cdi: number, percent: number) {
   return Math.pow(1 + annualRate, 1 / 12) - 1;
 }
 
-function solveInitial(inputs: ParsedInputs) {
+function solveInitial(inputs: CalculatorParsedInputs) {
   const { monthly = 0, months = 0, cdi = 0, percent = 0, final = 0 } = inputs;
   const monthlyRate = computeMonthlyRate(cdi, percent);
   const growthFactor = Math.pow(1 + monthlyRate, months);
@@ -125,7 +112,7 @@ function solveInitial(inputs: ParsedInputs) {
   return (final - monthly * annuityFactor) / growthFactor;
 }
 
-function solveMonthly(inputs: ParsedInputs) {
+function solveMonthly(inputs: CalculatorParsedInputs) {
   const { initial = 0, months = 0, cdi = 0, percent = 0, final = 0 } = inputs;
   const monthlyRate = computeMonthlyRate(cdi, percent);
   const growthFactor = Math.pow(1 + monthlyRate, months);

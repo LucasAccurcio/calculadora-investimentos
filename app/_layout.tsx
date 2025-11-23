@@ -21,13 +21,13 @@ function RootLayoutContent() {
           <SafeAreaView style={{ flex: 1, backgroundColor: Colors[colorScheme].background }}>
             <Stack>
               <Stack.Screen name="index" options={{ headerShown: false }} />
-              <Stack.Screen name="calculators/cdb" options={{ title: 'Calculadora CDB' }} />
+              <Stack.Screen name="calculators/cdb/index" options={{ title: 'Calculadora CDB' }} />
               <Stack.Screen
-                name="calculators/lci-lca"
+                name="calculators/lci-lca/index"
                 options={{ title: 'Calculadora LCI / LCA' }}
               />
               <Stack.Screen
-                name="calculators/tesouro"
+                name="calculators/tesouro-direto/index"
                 options={{ title: 'Calculadora Tesouro Direto' }}
               />
             </Stack>

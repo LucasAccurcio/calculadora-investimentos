@@ -1,50 +1,76 @@
-# Welcome to your Expo app 👋
+# Calculadora de Investimentos
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+> Aplicativo Expo/React Native para comparar retornos de CDB, LCI/LCA, Tesouro e futuras aplicações financeiras. A UI é construída com NativeWind + Gluestack UI para garantir consistência entre Android, iOS e Web.
 
-## Get started
+## Tecnologias principais
 
-1. Install dependencies
+- Expo Router (SDK 54) + React Native 0.81.5
+- TypeScript com paths `@/...` configurados em `tsconfig.json`
+- NativeWind + Tailwind (`global.css` + `tailwind.config.js`)
+- Gluestack UI (componentes em `components/ui/*`)
+
+## Como começar
+
+1. Instale as dependências
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. Inicie o app (Metro + menu de plataformas)
 
    ```bash
-   npx expo start
+   npm run start
+   # ou npm run android / ios / web
    ```
 
-In the output, you'll find options to open the app in a
+3. Verifique formatação e qualidade sempre que possível
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   ```bash
+   npm run lint
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Estrutura do projeto
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+app/
+  _layout.tsx              # Stack + provedores globais
+  index.tsx                # Dashboard principal
+  home/                    # Dados e seções do dashboard
+  calculators/
+    components/            # Blocos reutilizáveis (ex.: CalculatorInput)
+    utils/                 # Formatação, CDI e cálculos financeiros
+    cdb/
+      index.tsx            # Tela da calculadora
+      style.ts             # Stylesheet específico
+      components/          # UI exclusiva (ex.: ProjectionSummary)
+    lci-lca.tsx, tesouro.tsx (em transição para a estrutura acima)
+components/
+  home/, ui/, themed-*     # UI compartilhada para todo o app
+hooks/, constants/, assets/
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Padrões das calculadoras
 
-## Learn more
+- Cada produto fica em `app/calculators/<produto>/` com `index.tsx`, `style.ts` e, quando necessário, `components/` para blocos exclusivos.
+- Utilize `app/calculators/components` antes de criar novos inputs ou wrappers. `CalculatorInput` já inclui label, helper e botão de limpar inline.
+- Lógica de formato, parsing e CDI deve morar em `app/calculators/utils`. Se outro produto precisar de cálculos próprios, adicione um arquivo novo nessa pasta e importe de lá.
+- Todas as telas de formulário devem usar `KeyboardAwareScrollView` com `extraScrollHeight` padronizado, conforme o exemplo do CDB.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Scripts úteis
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+| Script                  | Descrição                                                       |
+| ----------------------- | --------------------------------------------------------------- |
+| `npm run start`         | Abre o menu do Expo para iniciar Android/iOS/Web ou Expo Go.    |
+| `npm run android`       | Inicia diretamente no emulador Android.                         |
+| `npm run ios`           | Inicia no simulador iOS (macOS).                                |
+| `npm run web`           | Executa o bundler web.                                          |
+| `npm run lint`          | ESLint + Prettier (usa `expo lint`).                            |
+| `npm run reset-project` | Move o template para `app-example/` e cria um `app/` em branco. |
 
-## Join the community
+## Convenções
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Use `ThemedText` e `ThemedView` para herdar automaticamente as cores de `constants/theme.ts`.
+- Sempre que precisar de novos tokens, sincronize `components/ui/gluestack-ui-provider/config.ts` e `tailwind.config.js`.
+- Prefira importar com `@/` para manter Metro, TypeScript e lint alinhados.
+- Componentes novos devem vir acompanhados de comentários sucintos somente onde o código não for autoexplicativo.

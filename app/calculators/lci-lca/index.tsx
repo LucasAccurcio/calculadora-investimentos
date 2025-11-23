@@ -2,15 +2,12 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
-import { ProjectionSummary } from '@/features/calculators/cdb/projection-summary';
-import { styles } from '@/features/calculators/cdb/style';
 import { CalculatorInput } from '@/features/calculators/components/calculator-input';
+import { styles } from '@/features/calculators/lci-lca/style';
+import { TaxFreeSummary } from '@/features/calculators/lci-lca/tax-free-summary';
 import {
-  type CalculableField,
   CalculatorFieldKey,
-  type ProjectionInputs,
-  type ProjectionResult,
-  calculateProjection,
+  calculateLciLcaProjection,
   currencyFields,
   fetchLatestCdiRate,
   formatCurrencyFromNumber,
@@ -21,6 +18,9 @@ import {
   persistCdiRate,
   readStoredCdiRate,
   solveForMissingField,
+  type CalculableField,
+  type LciLcaProjectionResult,
+  type ProjectionInputs,
 } from '@/features/calculators/utils';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useCallback, useEffect, useState } from 'react';
@@ -32,22 +32,24 @@ const INITIAL_FIELDS: Record<CalculatorFieldKey, string> = {
   monthly: '',
   months: '',
   cdi: '',
-  percent: '100',
+  percent: '95',
   final: '',
 };
 
 const extraScrollHeight = Platform.select({ ios: 32, android: 64, default: 48 }) ?? 48;
 
-export default function CdbCalculatorScreen() {
+export default function LciLcaCalculatorScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const palette = Colors[colorScheme];
+  const summaryBackground =
+    colorScheme === 'light' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255, 255, 255, 0.08)';
 
   const [fields, setFields] = useState<Record<CalculatorFieldKey, string>>(INITIAL_FIELDS);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [isFetchingCdi, setIsFetchingCdi] = useState(true);
   const [storedCdiRate, setStoredCdiRate] = useState<number | null>(null);
-  const [projectionDetails, setProjectionDetails] = useState<ProjectionResult | null>(null);
+  const [projectionDetails, setProjectionDetails] = useState<LciLcaProjectionResult | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -101,7 +103,7 @@ export default function CdbCalculatorScreen() {
       monthly: '',
       months: '',
       cdi: prev.cdi,
-      percent: '100',
+      percent: '95',
       final: '',
     }));
     setError(null);
@@ -135,15 +137,15 @@ export default function CdbCalculatorScreen() {
 
     if (missing === 'final') {
       const projectionInputs = values as ProjectionInputs;
-      const result = calculateProjection(projectionInputs);
-      setFields((prev) => ({ ...prev, final: formatCurrencyFromNumber(result.gross) }));
-      setInfo('Valor bruto final calculado com base nas demais entradas.');
+      const result = calculateLciLcaProjection(projectionInputs);
+      setFields((prev) => ({ ...prev, final: formatCurrencyFromNumber(result.net) }));
+      setInfo('Valor final estimado com base na taxa informada (isento de IR).');
       setProjectionDetails(result);
       return;
     }
 
     if (values.final == null || values.final <= 0) {
-      setError('Informe o Valor Bruto Final para que possamos calcular os demais campos.');
+      setError('Informe o Valor Final para que possamos calcular os demais campos.');
       return;
     }
 
@@ -156,10 +158,10 @@ export default function CdbCalculatorScreen() {
     }
 
     (values as Record<CalculatorFieldKey, number | undefined>)[missing] = solved;
-    const projection = calculateProjection(values as ProjectionInputs);
+    const projection = calculateLciLcaProjection(values as ProjectionInputs);
     const formattedValue = formatFieldValue(missing, solved);
     setFields((prev) => ({ ...prev, [missing]: formattedValue }));
-    setInfo('Campo calculado com sucesso.');
+    setInfo('Campo calculado com sucesso (isenção automática considerada).');
     setProjectionDetails(projection);
   }, [fields, storedCdiRate]);
 
@@ -176,7 +178,7 @@ export default function CdbCalculatorScreen() {
           label="Valor inicial (R$)"
           value={fields.initial}
           onChangeText={(text) => handleChange('initial', text)}
-          placeholder="Ex: 10.000,00"
+          placeholder="Ex: 15.000,00"
           onClear={() => handleChange('initial', '')}
           palette={palette}
           containerStyle={styles.inputGroup}
@@ -187,7 +189,7 @@ export default function CdbCalculatorScreen() {
           label="Valor mensal (R$)"
           value={fields.monthly}
           onChangeText={(text) => handleChange('monthly', text)}
-          placeholder="Ex: 1.000,00"
+          placeholder="Ex: 800,00"
           onClear={() => handleChange('monthly', '')}
           palette={palette}
           containerStyle={styles.inputGroup}
@@ -198,7 +200,7 @@ export default function CdbCalculatorScreen() {
           label="Prazo em meses"
           value={fields.months}
           onChangeText={(text) => handleChange('months', text.replace(/[^0-9]/g, ''))}
-          placeholder="Ex: 24"
+          placeholder="Ex: 36"
           onClear={() => handleChange('months', '')}
           palette={palette}
           containerStyle={styles.inputGroup}
@@ -223,7 +225,7 @@ export default function CdbCalculatorScreen() {
           label="Percentual do CDI (%)"
           value={fields.percent}
           onChangeText={(text) => handleChange('percent', text)}
-          placeholder="Ex: 110"
+          placeholder="Ex: 95"
           onClear={() => handleChange('percent', '')}
           palette={palette}
           containerStyle={styles.inputGroup}
@@ -231,10 +233,10 @@ export default function CdbCalculatorScreen() {
           helperStyle={styles.helper}
         />
         <CalculatorInput
-          label="Valor bruto final (R$)"
+          label="Valor final (R$)"
           value={fields.final}
           onChangeText={(text) => handleChange('final', text)}
-          placeholder="Ex: 45.000,00"
+          placeholder="Ex: 32.500,00"
           onClear={() => handleChange('final', '')}
           palette={palette}
           containerStyle={styles.inputGroup}
@@ -243,9 +245,10 @@ export default function CdbCalculatorScreen() {
         />
 
         {projectionDetails ? (
-          <ProjectionSummary
+          <TaxFreeSummary
             palette={palette}
             details={projectionDetails}
+            backgroundColor={summaryBackground}
             borderColor={palette.tint}
             cardStyle={styles.summaryCard}
             labelStyle={styles.summaryLabel}
@@ -256,14 +259,12 @@ export default function CdbCalculatorScreen() {
         {error ? <ThemedText style={styles.error}>{error}</ThemedText> : null}
         {info ? <ThemedText style={styles.info}>{info}</ThemedText> : null}
 
-        {!projectionDetails ? (
-          <ThemedView style={[styles.tipCard, { borderColor: palette.tint }]}>
-            <IconSymbol name="info.circle" size={20} color={palette.tint} />
-            <ThemedText style={[styles.tipText, { color: palette.text }]}>
-              Deixe um campo em branco para que possamos calculá-lo para você.
-            </ThemedText>
-          </ThemedView>
-        ) : null}
+        <ThemedView style={[styles.tipCard, { borderColor: palette.tint }]}>
+          <IconSymbol name="info.circle" size={20} color={palette.tint} />
+          <ThemedText style={[styles.tipText, { color: palette.text }]}>
+            Lembre-se: LCI e LCA são isentos de IR para pessoas físicas.
+          </ThemedText>
+        </ThemedView>
         <Pressable
           accessibilityRole="button"
           style={styles.primaryButton}

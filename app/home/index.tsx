@@ -1,6 +1,5 @@
 import { ScrollView, StyleSheet } from 'react-native';
 
-import { CALCULATORS } from '@/app/calculators';
 import { CalculatorMenuList } from '@/components/home/calculator-menu-list';
 import { HomeHeader } from '@/components/home/home-header';
 import { PreferencesAccordion } from '@/components/home/preferences-accordion';
@@ -8,6 +7,7 @@ import { SectionHeading } from '@/components/home/section-heading';
 import { SubscriptionBanner } from '@/components/home/subscription-banner';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
+import { CALCULATORS } from '@/features/home/calculators';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export default function HomeScreen() {
