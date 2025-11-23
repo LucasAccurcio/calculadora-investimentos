@@ -41,8 +41,6 @@ const extraScrollHeight = Platform.select({ ios: 32, android: 64, default: 48 })
 export default function LciLcaCalculatorScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const palette = Colors[colorScheme];
-  const summaryBackground =
-    colorScheme === 'light' ? 'rgba(34, 197, 94, 0.12)' : 'rgba(255, 255, 255, 0.08)';
 
   const [fields, setFields] = useState<Record<CalculatorFieldKey, string>>(INITIAL_FIELDS);
   const [error, setError] = useState<string | null>(null);
@@ -248,7 +246,6 @@ export default function LciLcaCalculatorScreen() {
           <TaxFreeSummary
             palette={palette}
             details={projectionDetails}
-            backgroundColor={summaryBackground}
             borderColor={palette.tint}
             cardStyle={styles.summaryCard}
             labelStyle={styles.summaryLabel}
