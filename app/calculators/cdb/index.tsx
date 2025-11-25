@@ -151,6 +151,8 @@ export default function CdbCalculatorScreen() {
         netResult: result.net,
         cdiRate: projectionInputs.cdi,
         cdiPercent: projectionInputs.percent,
+        taxRate: result.taxRate,
+        taxAmount: result.taxAmount,
       });
       return;
     }
@@ -183,6 +185,8 @@ export default function CdbCalculatorScreen() {
       netResult: projection.net,
       cdiRate: (values.cdi as number) ?? 0,
       cdiPercent: (values.percent as number) ?? 0,
+      taxRate: projection.taxRate,
+      taxAmount: projection.taxAmount,
     });
   }, [fields, storedCdiRate]);
 

@@ -191,6 +191,8 @@ export default function TesouroCalculatorScreen() {
           grossResult: result.gross,
           netResult: result.net,
           rate: rateConfig.selicRate ?? rateConfig.prefixRate ?? rateConfig.ipcaRate,
+          taxRate: result.taxRate,
+          taxAmount: result.taxAmount,
         });
         return;
       }
@@ -280,6 +282,8 @@ export default function TesouroCalculatorScreen() {
         grossResult: projection.gross,
         netResult: projection.net,
         rate: rateConfig.selicRate ?? rateConfig.prefixRate ?? rateConfig.ipcaRate,
+        taxRate: projection.taxRate,
+        taxAmount: projection.taxAmount,
       });
     } catch (err) {
       setError(

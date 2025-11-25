@@ -11,6 +11,8 @@ export type CDBShareData = {
   netResult: number;
   cdiRate: number;
   cdiPercent: number;
+  taxRate: number;
+  taxAmount: number;
 };
 
 export type LCILCAShareData = {
@@ -32,6 +34,8 @@ export type TesouroShareData = {
   grossResult: number;
   netResult: number;
   rate?: number;
+  taxRate: number;
+  taxAmount: number;
 };
 
 export type ShareData = CDBShareData | LCILCAShareData | TesouroShareData;
@@ -46,36 +50,56 @@ function formatCurrency(value: number): string {
 }
 
 function formatCDBMessage(data: CDBShareData): string {
-  const totalInvested = data.invested + data.monthlyContribution * data.deadline;
   const lines = [
     `Simulação – ${data.productName}`,
-    `Investi: ${formatCurrency(totalInvested)}`,
-    `Prazo: ${data.deadline} meses`,
-    `Taxa CDI: ${data.cdiRate.toFixed(2)}% | ${data.cdiPercent.toFixed(0)}% do CDI`,
-    `Valor bruto: ${formatCurrency(data.grossResult)}`,
-    `Valor líquido: ${formatCurrency(data.netResult)}`,
     '',
-    'Calculado com Renda Fixa Pro',
-  ];
+    '📊 Aportes:',
+    `  Inicial: ${formatCurrency(data.invested)}`,
+    data.monthlyContribution > 0
+      ? `  Mensal: ${formatCurrency(data.monthlyContribution)} (${data.deadline}x)`
+      : '',
+    `  Total investido: ${formatCurrency(data.invested + data.monthlyContribution * data.deadline)}`,
+    '',
+    '💰 Rentabilidade:',
+    `  Taxa CDI: ${data.cdiRate.toFixed(2)}% | ${data.cdiPercent.toFixed(0)}% do CDI`,
+    `  Prazo: ${data.deadline} meses`,
+    '',
+    '💵 Resultado:',
+    `  Valor bruto: ${formatCurrency(data.grossResult)}`,
+    `  Alíquota de IR: ${(data.taxRate * 100).toFixed(1)}%`,
+    `  Imposto de Renda: ${formatCurrency(data.taxAmount)}`,
+    `  Valor líquido: ${formatCurrency(data.netResult)}`,
+    '',
+    '*Calculado com RendaFixa Pro*',
+  ].filter((line) => line.length > 0);
   return lines.join('\n');
 }
 
 function formatLCILCAMessage(data: LCILCAShareData): string {
-  const totalInvested = data.invested + data.monthlyContribution * data.deadline;
   const lines = [
     `Simulação – ${data.productName}`,
-    `Investi: ${formatCurrency(totalInvested)}`,
-    `Prazo: ${data.deadline} meses`,
-    `Taxa CDI: ${data.cdiRate.toFixed(2)}% | ${data.cdiPercent.toFixed(0)}% do CDI`,
-    `Valor final (isento de IR): ${formatCurrency(data.result)}`,
     '',
-    'Calculado com Renda Fixa Pro',
-  ];
+    '📊 Aportes:',
+    `  Inicial: ${formatCurrency(data.invested)}`,
+    data.monthlyContribution > 0
+      ? `  Mensal: ${formatCurrency(data.monthlyContribution)} (${data.deadline}x)`
+      : '',
+    `  Total investido: ${formatCurrency(data.invested + data.monthlyContribution * data.deadline)}`,
+    '',
+    '💰 Rentabilidade:',
+    `  Taxa CDI: ${data.cdiRate.toFixed(2)}% | ${data.cdiPercent.toFixed(0)}% do CDI`,
+    `  Prazo: ${data.deadline} meses`,
+    `  Status: Isento de Imposto de Renda (PF)`,
+    '',
+    '💵 Resultado:',
+    `  Valor final: ${formatCurrency(data.result)}`,
+    '',
+    '*Calculado com RendaFixa Pro*',
+  ].filter((line) => line.length > 0);
   return lines.join('\n');
 }
 
 function formatTesouroMessage(data: TesouroShareData): string {
-  const totalInvested = data.invested + data.monthlyContribution * data.deadline;
   const modalityLabel = {
     selic: 'Tesouro Selic',
     prefixado: 'Tesouro Prefixado',
@@ -84,13 +108,25 @@ function formatTesouroMessage(data: TesouroShareData): string {
 
   const lines = [
     `Simulação – ${data.productName} (${modalityLabel})`,
-    `Investi: ${formatCurrency(totalInvested)}`,
-    `Prazo: ${data.deadline} meses`,
-    data.rate ? `Taxa anual: ${data.rate.toFixed(2)}%` : '',
-    `Valor bruto: ${formatCurrency(data.grossResult)}`,
-    `Valor líquido: ${formatCurrency(data.netResult)}`,
     '',
-    'Calculado com Renda Fixa Pro',
+    '📊 Aportes:',
+    `  Inicial: ${formatCurrency(data.invested)}`,
+    data.monthlyContribution > 0
+      ? `  Mensal: ${formatCurrency(data.monthlyContribution)} (${data.deadline}x)`
+      : '',
+    `  Total investido: ${formatCurrency(data.invested + data.monthlyContribution * data.deadline)}`,
+    '',
+    '💰 Rentabilidade:',
+    data.rate ? `  Taxa anual: ${data.rate.toFixed(2)}%` : '',
+    `  Prazo: ${data.deadline} meses`,
+    '',
+    '💵 Resultado:',
+    `  Valor bruto: ${formatCurrency(data.grossResult)}`,
+    `  Alíquota de IR: ${(data.taxRate * 100).toFixed(1)}%`,
+    `  Imposto de Renda: ${formatCurrency(data.taxAmount)}`,
+    `  Valor líquido: ${formatCurrency(data.netResult)}`,
+    '',
+    '*Calculado com RendaFixa Pro*',
   ].filter((line) => line.length > 0);
 
   return lines.join('\n');
