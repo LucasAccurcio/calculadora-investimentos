@@ -25,6 +25,7 @@ const MAPPING = {
   'banknote.fill': 'paid',
   'info.circle': 'info',
   'xmark.circle.fill': 'close',
+  'square.and.arrow.up': 'share',
 } as IconMapping;
 
 /**

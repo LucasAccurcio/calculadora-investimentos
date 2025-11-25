@@ -22,6 +22,7 @@ import {
   type LciLcaProjectionResult,
   type ProjectionInputs,
 } from '@/features/calculators/utils';
+import { type LCILCAShareData } from '@/features/shared/share';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform, Pressable } from 'react-native';
@@ -48,6 +49,7 @@ export default function LciLcaCalculatorScreen() {
   const [isFetchingCdi, setIsFetchingCdi] = useState(true);
   const [storedCdiRate, setStoredCdiRate] = useState<number | null>(null);
   const [projectionDetails, setProjectionDetails] = useState<LciLcaProjectionResult | null>(null);
+  const [shareData, setShareData] = useState<LCILCAShareData | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -107,6 +109,7 @@ export default function LciLcaCalculatorScreen() {
     setError(null);
     setInfo(null);
     setProjectionDetails(null);
+    setShareData(null);
   }, []);
 
   const handleCalculate = useCallback(() => {
@@ -139,6 +142,15 @@ export default function LciLcaCalculatorScreen() {
       setFields((prev) => ({ ...prev, final: formatCurrencyFromNumber(result.net) }));
       setInfo('Valor final estimado com base na taxa informada (isento de IR).');
       setProjectionDetails(result);
+      setShareData({
+        productName: 'LCI/LCA',
+        invested: projectionInputs.initial,
+        monthlyContribution: projectionInputs.monthly,
+        deadline: projectionInputs.months,
+        result: result.net,
+        cdiRate: projectionInputs.cdi,
+        cdiPercent: projectionInputs.percent,
+      });
       return;
     }
 
@@ -161,6 +173,15 @@ export default function LciLcaCalculatorScreen() {
     setFields((prev) => ({ ...prev, [missing]: formattedValue }));
     setInfo('Campo calculado com sucesso (isenção automática considerada).');
     setProjectionDetails(projection);
+    setShareData({
+      productName: 'LCI/LCA',
+      invested: (values.initial as number) ?? 0,
+      monthlyContribution: (values.monthly as number) ?? 0,
+      deadline: (values.months as number) ?? 0,
+      result: projection.net,
+      cdiRate: (values.cdi as number) ?? 0,
+      cdiPercent: (values.percent as number) ?? 0,
+    });
   }, [fields, storedCdiRate]);
 
   return (
@@ -250,6 +271,7 @@ export default function LciLcaCalculatorScreen() {
             cardStyle={styles.summaryCard}
             labelStyle={styles.summaryLabel}
             valueStyle={styles.summaryValue}
+            shareData={shareData ?? undefined}
           />
         ) : null}
 

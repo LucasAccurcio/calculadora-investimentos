@@ -4,7 +4,14 @@ Fase 1 – Alicerce (MVP básico)
 - [x] Calculadora CDB/RDB (tela, cálculo, lógica reversa)
 - [x] Calculadora LCI/LCA (tela, cálculo, lógica reversa)
 - [x] Calculadora Tesouro Direto (tela, cálculo, ajuste final) — ver issue separada
-- [ ] Compartilhamento (todas calculadoras)
+- [x] Adicionar funcionalidade de compartilhamento do resultado final da simulação para WhatsApp, e-mail ou outros aplicativos usando a Share API do Expo.
+			Checklist:
+			- [x] Criar função utilitária para formatar o texto compartilhado (incluindo tipo de investimento, valor investido, prazo, resultado final, tipo/taxa, etc.)
+			- [x] Integrar botão de compartilhamento no componente de resultado de cada calculadora
+			- [x] Testar o fluxo nos três produtos: CDB, LCI/LCA e Tesouro Direto
+			- [x] Garantir que o texto fique sempre claro independente do produto ou tipo de simulação (também para reverso)
+			- [x] Mensagem padrão: “Simulação – [Produto], Investi: R$ X, Prazo: Y, Resultado: R$ Z – calculado com Renda Fixa Pro”
+			- [] Futuro: explorar exportação como imagem (screenshot do resultado)
 
 Fase 2 – MVP Pro/Monetização
 - [ ] Paywall e onboarding Pro (RevenueCat ou similar)

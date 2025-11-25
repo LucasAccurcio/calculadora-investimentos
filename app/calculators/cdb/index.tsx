@@ -22,6 +22,7 @@ import {
   readStoredCdiRate,
   solveForMissingField,
 } from '@/features/calculators/utils';
+import { type CDBShareData } from '@/features/shared/share';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useCallback, useEffect, useState } from 'react';
 import { Platform, Pressable } from 'react-native';
@@ -48,6 +49,7 @@ export default function CdbCalculatorScreen() {
   const [isFetchingCdi, setIsFetchingCdi] = useState(true);
   const [storedCdiRate, setStoredCdiRate] = useState<number | null>(null);
   const [projectionDetails, setProjectionDetails] = useState<ProjectionResult | null>(null);
+  const [shareData, setShareData] = useState<CDBShareData | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -107,6 +109,7 @@ export default function CdbCalculatorScreen() {
     setError(null);
     setInfo(null);
     setProjectionDetails(null);
+    setShareData(null);
   }, []);
 
   const handleCalculate = useCallback(() => {
@@ -139,6 +142,16 @@ export default function CdbCalculatorScreen() {
       setFields((prev) => ({ ...prev, final: formatCurrencyFromNumber(result.gross) }));
       setInfo('Valor bruto final calculado com base nas demais entradas.');
       setProjectionDetails(result);
+      setShareData({
+        productName: 'CDB',
+        invested: projectionInputs.initial,
+        monthlyContribution: projectionInputs.monthly,
+        deadline: projectionInputs.months,
+        grossResult: result.gross,
+        netResult: result.net,
+        cdiRate: projectionInputs.cdi,
+        cdiPercent: projectionInputs.percent,
+      });
       return;
     }
 
@@ -161,6 +174,16 @@ export default function CdbCalculatorScreen() {
     setFields((prev) => ({ ...prev, [missing]: formattedValue }));
     setInfo('Campo calculado com sucesso.');
     setProjectionDetails(projection);
+    setShareData({
+      productName: 'CDB',
+      invested: (values.initial as number) ?? 0,
+      monthlyContribution: (values.monthly as number) ?? 0,
+      deadline: (values.months as number) ?? 0,
+      grossResult: projection.gross,
+      netResult: projection.net,
+      cdiRate: (values.cdi as number) ?? 0,
+      cdiPercent: (values.percent as number) ?? 0,
+    });
   }, [fields, storedCdiRate]);
 
   return (
@@ -250,6 +273,7 @@ export default function CdbCalculatorScreen() {
             cardStyle={styles.summaryCard}
             labelStyle={styles.summaryLabel}
             valueStyle={styles.summaryValue}
+            shareData={shareData ?? undefined}
           />
         ) : null}
 

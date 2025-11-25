@@ -18,6 +18,7 @@ import {
   type TesouroProjectionResult,
   type TesouroSolvableField,
 } from '@/features/calculators/utils';
+import { type TesouroShareData } from '@/features/shared/share';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useCallback, useState } from 'react';
 import { Platform, Pressable } from 'react-native';
@@ -83,6 +84,7 @@ export default function TesouroCalculatorScreen() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [projectionDetails, setProjectionDetails] = useState<TesouroProjectionResult | null>(null);
+  const [shareData, setShareData] = useState<TesouroShareData | null>(null);
 
   const handleChange = useCallback((key: TesouroFieldKey, value: string) => {
     let nextValue = value;
@@ -180,6 +182,16 @@ export default function TesouroCalculatorScreen() {
         setProjectionDetails(result);
         setFields((prev) => ({ ...prev, final: formatCurrencyFromNumber(result.gross) }));
         setInfo('Estimativa considera a taxa informada e a tabela regressiva de IR.');
+        setShareData({
+          productName: 'Tesouro Direto',
+          modality,
+          invested: initial,
+          monthlyContribution: monthly,
+          deadline: months,
+          grossResult: result.gross,
+          netResult: result.net,
+          rate: rateConfig.selicRate ?? rateConfig.prefixRate ?? rateConfig.ipcaRate,
+        });
         return;
       }
 
@@ -259,6 +271,16 @@ export default function TesouroCalculatorScreen() {
         final: formatCurrencyFromNumber(parsedFinal),
       }));
       setInfo('Campo recalculado a partir do Valor Bruto Final desejado.');
+      setShareData({
+        productName: 'Tesouro Direto',
+        modality,
+        invested: resolvedInitial,
+        monthlyContribution: resolvedMonthly,
+        deadline: resolvedMonths,
+        grossResult: projection.gross,
+        netResult: projection.net,
+        rate: rateConfig.selicRate ?? rateConfig.prefixRate ?? rateConfig.ipcaRate,
+      });
     } catch (err) {
       setError(
         err instanceof Error
@@ -274,6 +296,7 @@ export default function TesouroCalculatorScreen() {
     setError(null);
     setInfo(null);
     setProjectionDetails(null);
+    setShareData(null);
   }, []);
 
   const summaryBackground =
@@ -438,6 +461,7 @@ export default function TesouroCalculatorScreen() {
             cardStyle={[styles.summaryCard, { backgroundColor: summaryBackground }]}
             labelStyle={styles.summaryLabel}
             valueStyle={styles.summaryValue}
+            shareData={shareData ?? undefined}
           />
         ) : null}
 
