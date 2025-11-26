@@ -1,8 +1,8 @@
-import { StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { Button, ButtonText } from '@/components/ui/button';
+import { IconSymbol } from '../ui/icon-symbol';
 
 type Palette = (typeof import('@/constants/theme').Colors)['light'];
 
@@ -14,16 +14,18 @@ type SubscriptionBannerProps = {
 export function SubscriptionBanner({ palette, onPress }: SubscriptionBannerProps) {
   return (
     <ThemedView style={[styles.container, { borderColor: palette.tint }]}>
-      <ThemedView style={styles.textGroup}>
-        <ThemedText type="subtitle">Assine o Premium</ThemedText>
-        <ThemedText style={styles.description}>
-          Desbloqueie comparações ilimitadas, exporte relatórios em PDF e receba alertas de
-          rentabilidade semanal.
-        </ThemedText>
-      </ThemedView>
-      <Button action="primary" size="lg" onPress={onPress}>
-        <ButtonText>Assinar agora</ButtonText>
-      </Button>
+      <Pressable onPress={onPress}>
+        <ThemedView style={styles.textGroup}>
+          <ThemedView style={styles.titleWithIcon}>
+            <IconSymbol name="crown.fill" size={24} color="#fbbf24" />
+            <ThemedText type="subtitle">Assine o Premium</ThemedText>
+          </ThemedView>
+          <ThemedText style={styles.description}>
+            Desbloqueie comparações ilimitadas, exporte relatórios em PDF e receba alertas de
+            rentabilidade semanal.
+          </ThemedText>
+        </ThemedView>
+      </Pressable>
     </ThemedView>
   );
 }
@@ -36,8 +38,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     gap: 16,
   },
+  titleWithIcon: {
+    backgroundColor: 'transparent',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    gap: 8,
+  },
   textGroup: {
     gap: 6,
+    backgroundColor: 'transparent',
   },
   description: {
     fontSize: 15,

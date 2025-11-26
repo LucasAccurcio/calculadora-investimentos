@@ -23,7 +23,7 @@ export function CalculatorMenuList({ items, palette }: CalculatorMenuListProps) 
               <ThemedView style={styles.bodyContainer}>
                 <ThemedView style={styles.titleContainer}>
                   <ThemedView style={[styles.iconContainer, { backgroundColor: menu.accent }]}>
-                    <IconSymbol name={menu.icon} size={26} color={palette.tint} />
+                    <IconSymbol name={menu.icon} size={26} color="#ffffff" />
                   </ThemedView>
                   <ThemedText type="subtitle">{menu.title}</ThemedText>
                 </ThemedView>

@@ -47,7 +47,7 @@ export default function HomeScreen() {
         isOpen={isDrawerOpen}
         onClose={closeDrawer}
         anchor="left"
-        size="lg">
+        size="full">
         <DrawerBackdrop onPress={closeDrawer} />
         <DrawerContent>
           <DrawerHeader>

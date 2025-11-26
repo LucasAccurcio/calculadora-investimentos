@@ -26,6 +26,8 @@ const MAPPING = {
   'info.circle': 'info',
   'xmark.circle.fill': 'close',
   'square.and.arrow.up': 'share',
+  'crown.fill': 'military-tech',
+  xmark: 'close',
 } as IconMapping;
 
 /**
