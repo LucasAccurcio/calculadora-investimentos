@@ -174,15 +174,19 @@ function PreferenceOption<T extends string>({
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 20,
-    borderWidth: 1,
+    borderRadius: 16,
+    borderWidth: 0,
     padding: 4,
+    backgroundColor: 'rgba(0, 0, 0, 0.03)',
   },
   optionCopy: {
     flex: 1,
+    backgroundColor: 'transparent',
   },
   optionDescription: {
-    fontSize: 14,
-    marginTop: 2,
+    fontSize: 13,
+    marginTop: 4,
+    opacity: 0.6,
+    lineHeight: 18,
   },
 });

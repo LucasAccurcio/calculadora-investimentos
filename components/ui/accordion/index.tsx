@@ -1,12 +1,12 @@
 'use client';
-import React from 'react';
-import { createAccordion } from '@gluestack-ui/core/accordion/creator';
-import { View, Pressable, Text, Platform, TextProps } from 'react-native';
-import { tva, withStyleContext, useStyleContext } from '@gluestack-ui/utils/nativewind-utils';
-import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
 import { H3 } from '@expo/html-elements';
-import { cssInterop } from 'nativewind';
+import { createAccordion } from '@gluestack-ui/core/accordion/creator';
 import { PrimitiveIcon, UIIcon } from '@gluestack-ui/core/icon/creator';
+import type { VariantProps } from '@gluestack-ui/utils/nativewind-utils';
+import { tva, useStyleContext, withStyleContext } from '@gluestack-ui/utils/nativewind-utils';
+import { cssInterop } from 'nativewind';
+import React from 'react';
+import { Platform, Pressable, Text, TextProps, View } from 'react-native';
 
 const SCOPE = 'ACCORDION';
 /** Styles */
@@ -36,7 +36,7 @@ const accordionItemStyle = tva({
   },
 });
 const accordionTitleTextStyle = tva({
-  base: 'text-typography-900 font-bold flex-1 text-left',
+  base: 'text-typography-900 font-semibold flex-1 text-left',
   parentVariants: {
     size: {
       sm: 'text-sm',
@@ -59,12 +59,12 @@ const accordionIconStyle = tva({
   },
 });
 const accordionContentTextStyle = tva({
-  base: 'text-typography-700 font-normal',
+  base: 'text-typography-600 font-normal',
   parentVariants: {
     size: {
       sm: 'text-sm',
-      md: 'text-base',
-      lg: 'text-lg',
+      md: 'text-sm',
+      lg: 'text-base',
     },
   },
 });
@@ -72,10 +72,10 @@ const accordionHeaderStyle = tva({
   base: 'mx-0 my-0',
 });
 const accordionContentStyle = tva({
-  base: 'pt-1 pb-3 px-4',
+  base: 'pt-0 pb-4 px-4',
 });
 const accordionTriggerStyle = tva({
-  base: 'w-full flex-row justify-between items-center web:outline-none focus:outline-none data-[disabled=true]:opacity-40 data-[disabled=true]:cursor-not-allowed data-[focus-visible=true]:bg-background-50 py-3 px-4',
+  base: 'w-full flex-row justify-between items-center web:outline-none focus:outline-none data-[disabled=true]:opacity-40 data-[disabled=true]:cursor-not-allowed data-[focus-visible=true]:bg-background-50 py-4 px-4',
 });
 
 const Root = withStyleContext(View, SCOPE);
@@ -295,11 +295,11 @@ AccordionContent.displayName = 'AccordionContent';
 
 export {
   Accordion,
-  AccordionItem,
-  AccordionHeader,
-  AccordionTrigger,
-  AccordionTitleText,
-  AccordionContentText,
-  AccordionIcon,
   AccordionContent,
+  AccordionContentText,
+  AccordionHeader,
+  AccordionIcon,
+  AccordionItem,
+  AccordionTitleText,
+  AccordionTrigger,
 };
