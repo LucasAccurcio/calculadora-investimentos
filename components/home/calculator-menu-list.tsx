@@ -45,7 +45,7 @@ export function CalculatorMenuList({ items, palette }: CalculatorMenuListProps) 
 
 const styles = StyleSheet.create({
   list: {
-    gap: 16,
+    gap: 12,
   },
   card: {
     flexDirection: 'row',
@@ -53,31 +53,37 @@ const styles = StyleSheet.create({
     gap: 16,
     padding: 16,
     borderRadius: 16,
-    borderWidth: 1,
+    borderWidth: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.03)',
   },
   titleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 14,
+    backgroundColor: 'transparent',
   },
   bodyContainer: {
     flex: 1,
-    gap: 4,
+    gap: 6,
     flexDirection: 'column',
+    backgroundColor: 'transparent',
   },
   iconContainer: {
-    height: 48,
-    width: 48,
+    height: 44,
+    width: 44,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
   chevronContainer: {
-    width: 24,
-    marginRight: 8,
+    width: 20,
+    marginRight: 4,
+    opacity: 0.4,
   },
   description: {
-    fontSize: 14,
+    fontSize: 13,
     flexWrap: 'wrap',
+    opacity: 0.6,
+    lineHeight: 18,
   },
 });

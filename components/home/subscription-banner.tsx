@@ -33,24 +33,25 @@ export function SubscriptionBanner({ palette, onPress }: SubscriptionBannerProps
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    borderRadius: 20,
-    backgroundColor: 'rgba(41, 37, 255, 0.08)',
-    borderWidth: 1,
-    gap: 16,
+    borderRadius: 16,
+    backgroundColor: 'rgba(251, 191, 36, 0.08)',
+    borderWidth: 0,
+    gap: 12,
   },
   titleWithIcon: {
     backgroundColor: 'transparent',
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    gap: 8,
+    gap: 10,
   },
   textGroup: {
-    gap: 6,
+    gap: 8,
     backgroundColor: 'transparent',
   },
   description: {
-    fontSize: 15,
-    lineHeight: 22,
+    fontSize: 14,
+    lineHeight: 21,
+    opacity: 0.7,
   },
 });

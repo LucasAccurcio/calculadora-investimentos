@@ -343,7 +343,7 @@ export default function TesouroCalculatorScreen() {
                 <RadioIndicator>
                   <RadioIcon as={CircleIcon} />
                 </RadioIndicator>
-                <ThemedView>
+                <ThemedView style={styles.optionLabelContainer}>
                   <RadioLabel>{option.title}</RadioLabel>
                   <ThemedText style={styles.optionDescription}>{option.description}</ThemedText>
                 </ThemedView>
