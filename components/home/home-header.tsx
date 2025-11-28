@@ -18,16 +18,16 @@ export function HomeHeader({ palette, onOpenDrawer }: HomeHeaderProps) {
         accessibilityRole="button"
         accessibilityLabel="Abrir menu"
         onPress={onOpenDrawer}
-        style={[styles.iconButton, { borderColor: palette.icon }]}>
+        style={styles.iconButton}>
         <IconSymbol name="line.3.horizontal" color={palette.text} size={22} />
       </Pressable>
       <ThemedView style={styles.titleWrapper}>
-        <ThemedText type="subtitle">Calculadora</ThemedText>
-        <ThemedText type="title">Renda Fixa</ThemedText>
+        <ThemedText type="title" style={styles.appName}>
+          RendaFixa Pro
+        </ThemedText>
+        <ThemedText style={styles.tagline}>Seus investimentos, simplificados</ThemedText>
       </ThemedView>
-      <Pressable
-        accessibilityRole="button"
-        style={[styles.iconButton, { borderColor: palette.icon }]}>
+      <Pressable accessibilityRole="button" style={styles.iconButton}>
         <IconSymbol name="bell.fill" color={palette.text} size={22} />
       </Pressable>
     </ThemedView>
@@ -43,12 +43,23 @@ const styles = StyleSheet.create({
   titleWrapper: {
     flex: 1,
     marginHorizontal: 16,
+    alignItems: 'center',
+  },
+  appName: {
+    fontSize: 20,
+    letterSpacing: 0.3,
+  },
+  tagline: {
+    fontSize: 13,
+    opacity: 0.5,
+    marginTop: 2,
   },
   iconButton: {
     height: 44,
     width: 44,
-    borderWidth: 1,
-    borderRadius: 999,
+    borderWidth: 0,
+    borderRadius: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.04)',
     alignItems: 'center',
     justifyContent: 'center',
   },
