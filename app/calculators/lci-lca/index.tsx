@@ -3,6 +3,10 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { CalculatorInput } from '@/features/calculators/components/calculator-input';
+import {
+  InputSteppers,
+  type StepperOption,
+} from '@/features/calculators/components/input-steppers';
 import { PresetChips, type PresetOption } from '@/features/calculators/components/preset-chips';
 import { styles } from '@/features/calculators/lci-lca/style';
 import { TaxFreeSummary } from '@/features/calculators/lci-lca/tax-free-summary';
@@ -44,6 +48,18 @@ const MONTHS_PRESETS: PresetOption[] = [
   { label: '36m', value: '36' },
   { label: '60m', value: '60' },
   { label: '120m', value: '120' },
+];
+
+const MONTHS_STEPPERS: StepperOption[] = [
+  { label: '+1m', value: 1, icon: 'plus' },
+  { label: '+6m', value: 6, icon: 'plus' },
+  { label: '+12m', value: 12, icon: 'plus' },
+];
+
+const VALUE_STEPPERS: StepperOption[] = [
+  { label: '+R$ 100', value: 100, icon: 'plus' },
+  { label: '+R$ 500', value: 500, icon: 'plus' },
+  { label: '+R$ 1.000', value: 1000, icon: 'plus' },
 ];
 
 const PERCENT_PRESETS: PresetOption[] = [
@@ -108,6 +124,39 @@ export default function LciLcaCalculatorScreen() {
   const handleChange = useCallback((key: CalculatorFieldKey, value: string) => {
     const nextValue = currencyFields.has(key) ? formatCurrencyInput(value) : value;
     setFields((prev) => ({ ...prev, [key]: nextValue }));
+    setError(null);
+    setInfo(null);
+    setProjectionDetails(null);
+  }, []);
+
+  const handleStepValue = useCallback((key: CalculatorFieldKey, increment: number) => {
+    setFields((prev) => {
+      const currentValue = prev[key];
+      const parsed = currentValue
+        ? parseFloat(
+            currentValue
+              .replace(/[R$\s\u00A0]/g, '')
+              .replace(/\./g, '')
+              .replace(',', '.'),
+          )
+        : 0;
+      const newValue = Math.max(0, parsed + increment);
+      const formatted = currencyFields.has(key)
+        ? formatCurrencyFromNumber(newValue)
+        : newValue.toString();
+      return { ...prev, [key]: formatted };
+    });
+    setError(null);
+    setInfo(null);
+    setProjectionDetails(null);
+  }, []);
+
+  const handleStepMonths = useCallback((increment: number) => {
+    setFields((prev) => {
+      const current = parseInt(prev.months || '0', 10);
+      const newValue = Math.max(0, current + increment);
+      return { ...prev, months: newValue > 0 ? newValue.toString() : '' };
+    });
     setError(null);
     setInfo(null);
     setProjectionDetails(null);
@@ -220,6 +269,11 @@ export default function LciLcaCalculatorScreen() {
           labelStyle={styles.label}
           helperStyle={styles.helper}
         />
+        <InputSteppers
+          options={VALUE_STEPPERS}
+          onStep={(value) => handleStepValue('initial', value)}
+          palette={palette}
+        />
         <CalculatorInput
           label="Valor mensal (R$)"
           value={fields.monthly}
@@ -230,6 +284,11 @@ export default function LciLcaCalculatorScreen() {
           containerStyle={styles.inputGroup}
           labelStyle={styles.label}
           helperStyle={styles.helper}
+        />
+        <InputSteppers
+          options={VALUE_STEPPERS}
+          onStep={(value) => handleStepValue('monthly', value)}
+          palette={palette}
         />
         <CalculatorInput
           label="Prazo em meses"
@@ -242,6 +301,7 @@ export default function LciLcaCalculatorScreen() {
           labelStyle={styles.label}
           helperStyle={styles.helper}
         />
+        <InputSteppers options={MONTHS_STEPPERS} onStep={handleStepMonths} palette={palette} />
         <PresetChips
           options={MONTHS_PRESETS}
           onSelect={(value) => handleChange('months', value)}
