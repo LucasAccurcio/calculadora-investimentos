@@ -3,6 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Colors } from '@/constants/theme';
 import { CalculatorInput } from '@/features/calculators/components/calculator-input';
+import { PresetChips, type PresetOption } from '@/features/calculators/components/preset-chips';
 import { styles } from '@/features/calculators/lci-lca/style';
 import { TaxFreeSummary } from '@/features/calculators/lci-lca/tax-free-summary';
 import {
@@ -36,6 +37,21 @@ const INITIAL_FIELDS: Record<CalculatorFieldKey, string> = {
   percent: '95',
   final: '',
 };
+
+const MONTHS_PRESETS: PresetOption[] = [
+  { label: '12m', value: '12' },
+  { label: '24m', value: '24' },
+  { label: '36m', value: '36' },
+  { label: '60m', value: '60' },
+  { label: '120m', value: '120' },
+];
+
+const PERCENT_PRESETS: PresetOption[] = [
+  { label: '85% CDI', value: '85' },
+  { label: '90% CDI', value: '90' },
+  { label: '95% CDI', value: '95' },
+  { label: '100% CDI', value: '100' },
+];
 
 const extraScrollHeight = Platform.select({ ios: 32, android: 64, default: 48 }) ?? 48;
 
@@ -226,6 +242,12 @@ export default function LciLcaCalculatorScreen() {
           labelStyle={styles.label}
           helperStyle={styles.helper}
         />
+        <PresetChips
+          options={MONTHS_PRESETS}
+          onSelect={(value) => handleChange('months', value)}
+          palette={palette}
+          selectedValue={fields.months}
+        />
         <CalculatorInput
           label="Taxa (CDI anual %)"
           value={fields.cdi}
@@ -250,6 +272,12 @@ export default function LciLcaCalculatorScreen() {
           containerStyle={styles.inputGroup}
           labelStyle={styles.label}
           helperStyle={styles.helper}
+        />
+        <PresetChips
+          options={PERCENT_PRESETS}
+          onSelect={(value) => handleChange('percent', value)}
+          palette={palette}
+          selectedValue={fields.percent}
         />
         <CalculatorInput
           label="Valor final (R$)"

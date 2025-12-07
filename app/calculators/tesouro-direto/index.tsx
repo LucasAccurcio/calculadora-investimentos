@@ -5,6 +5,7 @@ import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Radio, RadioGroup, RadioIcon, RadioIndicator, RadioLabel } from '@/components/ui/radio';
 import { Colors } from '@/constants/theme';
 import { CalculatorInput } from '@/features/calculators/components/calculator-input';
+import { PresetChips, type PresetOption } from '@/features/calculators/components/preset-chips';
 import { TesouroProjectionSummary } from '@/features/calculators/tesouro-direto/projection-summary';
 import { styles } from '@/features/calculators/tesouro-direto/style';
 import {
@@ -40,6 +41,21 @@ const MODALITY_OPTIONS: { value: TesouroModality; title: string; description: st
     title: 'Tesouro IPCA+',
     description: 'Garante ganho real ao combinar IPCA estimado com uma taxa fixa adicional.',
   },
+];
+
+const MONTHS_PRESETS: PresetOption[] = [
+  { label: '12m', value: '12' },
+  { label: '24m', value: '24' },
+  { label: '36m', value: '36' },
+  { label: '60m', value: '60' },
+  { label: '120m', value: '120' },
+];
+
+const IPCA_REAL_PRESETS: PresetOption[] = [
+  { label: 'IPCA+ 4%', value: '4' },
+  { label: 'IPCA+ 5%', value: '5' },
+  { label: 'IPCA+ 6%', value: '6' },
+  { label: 'IPCA+ 7%', value: '7' },
 ];
 
 type TesouroFieldKey =
@@ -385,6 +401,12 @@ export default function TesouroCalculatorScreen() {
           labelStyle={styles.label}
           helperStyle={styles.helper}
         />
+        <PresetChips
+          options={MONTHS_PRESETS}
+          onSelect={(value) => handleChange('months', value)}
+          palette={palette}
+          selectedValue={fields.months}
+        />
         <CalculatorInput
           label="Valor bruto final (R$)"
           value={fields.final}
@@ -453,6 +475,12 @@ export default function TesouroCalculatorScreen() {
               containerStyle={styles.inputGroup}
               labelStyle={styles.label}
               helperStyle={styles.helper}
+            />
+            <PresetChips
+              options={IPCA_REAL_PRESETS}
+              onSelect={(value) => handleChange('realRate', value)}
+              palette={palette}
+              selectedValue={fields.realRate}
             />
           </>
         ) : null}
