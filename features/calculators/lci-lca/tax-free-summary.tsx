@@ -41,7 +41,7 @@ export function TaxFreeSummary({
     <ThemedView
       style={[cardStyle, { borderColor, backgroundColor: styles.tipCard.backgroundColor }]}
       accessibilityLabel="Resumo da projeção para LCI/LCA">
-      <ThemedView style={{ gap: 8, marginBottom: 12 }}>
+      <ThemedView style={{ gap: 8, backgroundColor: 'transparent' }}>
         <Badge label="Isento de IR" variant="success" palette={palette} />
         <ThemedText style={[labelStyle, { color: palette.icon }]}>Valor final estimado</ThemedText>
         <ThemedText style={[valueStyle, { color: palette.text }]}>

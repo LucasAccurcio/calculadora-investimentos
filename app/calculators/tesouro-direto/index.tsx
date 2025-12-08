@@ -25,8 +25,8 @@ import {
 } from '@/features/calculators/utils';
 import { type TesouroShareData } from '@/features/shared/share';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useCallback, useState } from 'react';
-import { Platform, Pressable } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Keyboard, Platform, Pressable } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const MODALITY_OPTIONS: { value: TesouroModality; title: string; description: string }[] = [
@@ -50,7 +50,6 @@ const MODALITY_OPTIONS: { value: TesouroModality; title: string; description: st
 const MONTHS_PRESETS: PresetOption[] = [
   { label: '1 ano', value: '12' },
   { label: '2 anos', value: '24' },
-  { label: '3 anos', value: '36' },
   { label: '5 anos', value: '60' },
   { label: '10 anos', value: '120' },
 ];
@@ -121,6 +120,17 @@ const extraScrollHeight = Platform.select({ ios: 32, android: 64, default: 48 })
 export default function TesouroCalculatorScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const palette = Colors[colorScheme];
+  const scrollViewRef = useRef<KeyboardAwareScrollView>(null);
+  const inputRefs = useRef<Record<string, any>>({
+    initial: null,
+    monthly: null,
+    months: null,
+    selic: null,
+    prefixRate: null,
+    ipcaRate: null,
+    realRate: null,
+    final: null,
+  });
 
   const [fields, setFields] = useState<Record<TesouroFieldKey, string>>(INITIAL_FIELDS);
   const [modality, setModality] = useState<TesouroModality>('selic');
@@ -128,6 +138,21 @@ export default function TesouroCalculatorScreen() {
   const [info, setInfo] = useState<string | null>(null);
   const [projectionDetails, setProjectionDetails] = useState<TesouroProjectionResult | null>(null);
   const [shareData, setShareData] = useState<TesouroShareData | null>(null);
+  const summaryOffsetY = useRef<number | null>(null);
+
+  // Auto-scroll to results when projection details change
+  useEffect(() => {
+    if (projectionDetails) {
+      setTimeout(() => {
+        const y = summaryOffsetY.current;
+        if (y != null) {
+          scrollViewRef.current?.scrollToPosition(0, y, true);
+        } else {
+          scrollViewRef.current?.scrollToPosition(0, 600, true);
+        }
+      }, 300);
+    }
+  }, [projectionDetails]);
 
   const handleChange = useCallback((key: TesouroFieldKey, value: string) => {
     let nextValue = value;
@@ -179,6 +204,7 @@ export default function TesouroCalculatorScreen() {
     setError(null);
     setInfo(null);
     setProjectionDetails(null);
+    Keyboard.dismiss();
 
     const finalTrimmed = fields.final.trim();
     const wantsReverse = finalTrimmed.length > 0;
@@ -370,6 +396,23 @@ export default function TesouroCalculatorScreen() {
     }
   }, [fields, modality]);
 
+  const focusNextInput = useCallback(
+    (currentField: string) => {
+      const fieldOrderByModality: Record<TesouroModality, string[]> = {
+        selic: ['initial', 'monthly', 'months', 'selic', 'final'],
+        prefixado: ['initial', 'monthly', 'months', 'prefixRate', 'final'],
+        ipca: ['initial', 'monthly', 'months', 'ipcaRate', 'realRate', 'final'],
+      };
+      const fieldOrder = fieldOrderByModality[modality];
+      const currentIndex = fieldOrder.indexOf(currentField);
+      if (currentIndex < fieldOrder.length - 1) {
+        const nextField = fieldOrder[currentIndex + 1];
+        inputRefs.current[nextField]?.focus();
+      }
+    },
+    [modality],
+  );
+
   const handleReset = useCallback(() => {
     setFields({ ...INITIAL_FIELDS });
     setModality('selic');
@@ -397,6 +440,7 @@ export default function TesouroCalculatorScreen() {
   return (
     <ThemedView style={styles.screen}>
       <KeyboardAwareScrollView
+        ref={scrollViewRef}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -430,10 +474,14 @@ export default function TesouroCalculatorScreen() {
 
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
+            ref={(ref) => {
+              inputRefs.current.initial = ref;
+            }}
             label="Valor inicial (R$)"
             tooltip={TOOLTIPS.initial}
             value={fields.initial}
             onChangeText={(text) => handleChange('initial', text)}
+            onSubmitEditing={() => focusNextInput('initial')}
             placeholder="Ex: 5.000,00"
             onClear={() => handleChange('initial', '')}
             palette={palette}
@@ -450,10 +498,14 @@ export default function TesouroCalculatorScreen() {
 
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
+            ref={(ref) => {
+              inputRefs.current.monthly = ref;
+            }}
             label="Valor mensal (R$)"
             tooltip={TOOLTIPS.monthly}
             value={fields.monthly}
             onChangeText={(text) => handleChange('monthly', text)}
+            onSubmitEditing={() => focusNextInput('monthly')}
             placeholder="Ex: 300,00"
             onClear={() => handleChange('monthly', '')}
             palette={palette}
@@ -470,10 +522,14 @@ export default function TesouroCalculatorScreen() {
 
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
+            ref={(ref) => {
+              inputRefs.current.months = ref;
+            }}
             label="Prazo em meses"
             tooltip={TOOLTIPS.months}
             value={fields.months}
             onChangeText={(text) => handleChange('months', text)}
+            onSubmitEditing={() => focusNextInput('months')}
             placeholder="Ex: 60"
             onClear={() => handleChange('months', '')}
             palette={palette}
@@ -490,10 +546,14 @@ export default function TesouroCalculatorScreen() {
           />
         </ThemedView>
         <CalculatorInput
+          ref={(ref) => {
+            inputRefs.current.final = ref;
+          }}
           label="Valor bruto final (R$)"
           tooltip={TOOLTIPS.final}
           value={fields.final}
           onChangeText={(text) => handleChange('final', text)}
+          onSubmitEditing={handleCalculate}
           placeholder="Ex: 80.000,00"
           helper="Opcional: deixe um campo vazio para resolvê-lo a partir do valor final."
           onClear={() => handleChange('final', '')}
@@ -505,10 +565,14 @@ export default function TesouroCalculatorScreen() {
 
         {modality === 'selic' ? (
           <CalculatorInput
+            ref={(ref) => {
+              inputRefs.current.selic = ref;
+            }}
             label="Taxa Selic anual (%)"
             tooltip={TOOLTIPS.selic}
             value={fields.selicRate}
             onChangeText={(text) => handleChange('selicRate', text)}
+            onSubmitEditing={handleCalculate}
             placeholder="Ex: 10.75"
             helper={modalityHelper[modality]}
             onClear={() => handleChange('selicRate', '')}
@@ -521,10 +585,14 @@ export default function TesouroCalculatorScreen() {
 
         {modality === 'prefixado' ? (
           <CalculatorInput
+            ref={(ref) => {
+              inputRefs.current.prefixRate = ref;
+            }}
             label="Taxa prefixada anual (%)"
             tooltip={TOOLTIPS.prefixRate}
             value={fields.prefixRate}
             onChangeText={(text) => handleChange('prefixRate', text)}
+            onSubmitEditing={handleCalculate}
             placeholder="Ex: 9.50"
             helper={modalityHelper[modality]}
             onClear={() => handleChange('prefixRate', '')}
@@ -538,10 +606,14 @@ export default function TesouroCalculatorScreen() {
         {modality === 'ipca' ? (
           <>
             <CalculatorInput
+              ref={(ref) => {
+                inputRefs.current.ipcaRate = ref;
+              }}
               label="IPCA anual estimado (%)"
               tooltip={TOOLTIPS.ipcaRate}
               value={fields.ipcaRate}
               onChangeText={(text) => handleChange('ipcaRate', text)}
+              onSubmitEditing={() => focusNextInput('ipcaRate')}
               placeholder="Ex: 4.00"
               helper="Use a projeção de inflação para o período."
               onClear={() => handleChange('ipcaRate', '')}
@@ -551,10 +623,14 @@ export default function TesouroCalculatorScreen() {
               helperStyle={styles.helper}
             />
             <CalculatorInput
+              ref={(ref) => {
+                inputRefs.current.realRate = ref;
+              }}
               label="Taxa adicional do IPCA (% a.a)"
               tooltip={TOOLTIPS.realRate}
               value={fields.realRate}
               onChangeText={(text) => handleChange('realRate', text)}
+              onSubmitEditing={handleCalculate}
               placeholder="Ex: 5.00"
               helper={modalityHelper[modality]}
               onClear={() => handleChange('realRate', '')}
@@ -573,15 +649,20 @@ export default function TesouroCalculatorScreen() {
         ) : null}
 
         {projectionDetails ? (
-          <TesouroProjectionSummary
-            palette={palette}
-            details={projectionDetails}
-            borderColor={palette.tint}
-            cardStyle={[styles.summaryCard, { backgroundColor: summaryBackground }]}
-            labelStyle={styles.summaryLabel}
-            valueStyle={styles.summaryValue}
-            shareData={shareData ?? undefined}
-          />
+          <ThemedView
+            onLayout={(e) => {
+              summaryOffsetY.current = e.nativeEvent.layout.y;
+            }}>
+            <TesouroProjectionSummary
+              palette={palette}
+              details={projectionDetails}
+              borderColor={palette.tint}
+              cardStyle={[styles.summaryCard, { backgroundColor: summaryBackground }]}
+              labelStyle={styles.summaryLabel}
+              valueStyle={styles.summaryValue}
+              shareData={shareData ?? undefined}
+            />
+          </ThemedView>
         ) : null}
 
         {error ? <ThemedText style={styles.error}>{error}</ThemedText> : null}

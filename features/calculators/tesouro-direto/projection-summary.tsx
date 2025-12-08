@@ -44,7 +44,7 @@ export function TesouroProjectionSummary({
     <ThemedView
       style={[cardStyle, { borderColor, backgroundColor: styles.tipCard.backgroundColor }]}
       accessibilityLabel="Resumo da projeção para Tesouro Direto">
-      <ThemedView style={{ gap: 8, marginBottom: 12 }}>
+      <ThemedView style={{ gap: 8, backgroundColor: 'transparent' }}>
         <Badge label="Marcado a Mercado" variant="info" palette={palette} />
         <ThemedText style={[labelStyle, { color: palette.icon }]}>
           Valor líquido estimado

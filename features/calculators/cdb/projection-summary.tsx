@@ -43,7 +43,7 @@ export function ProjectionSummary({
     <ThemedView
       style={[cardStyle, { borderColor, backgroundColor: styles.tipCard.backgroundColor }]}
       accessibilityLabel="Resumo da projeção do investimento">
-      <ThemedView style={{ gap: 8, marginBottom: 12 }}>
+      <ThemedView style={{ gap: 8, backgroundColor: 'transparent' }}>
         <Badge label="Tributado" variant="warning" palette={palette} />
         <ThemedText style={[labelStyle, { color: palette.icon }]}>
           Valor líquido estimado

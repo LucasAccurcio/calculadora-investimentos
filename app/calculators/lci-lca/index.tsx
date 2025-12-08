@@ -29,8 +29,8 @@ import {
 } from '@/features/calculators/utils';
 import { type LCILCAShareData } from '@/features/shared/share';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useCallback, useEffect, useState } from 'react';
-import { Platform, Pressable } from 'react-native';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Keyboard, Platform, Pressable } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const INITIAL_FIELDS: Record<CalculatorFieldKey, string> = {
@@ -45,7 +45,6 @@ const INITIAL_FIELDS: Record<CalculatorFieldKey, string> = {
 const MONTHS_PRESETS: PresetOption[] = [
   { label: '1 ano', value: '12' },
   { label: '2 anos', value: '24' },
-  { label: '3 anos', value: '36' },
   { label: '5 anos', value: '60' },
   { label: '10 anos', value: '120' },
 ];
@@ -83,6 +82,15 @@ const extraScrollHeight = Platform.select({ ios: 32, android: 64, default: 48 })
 export default function LciLcaCalculatorScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const palette = Colors[colorScheme];
+  const scrollViewRef = useRef<KeyboardAwareScrollView>(null);
+  const inputRefs = useRef<Record<CalculatorFieldKey, any>>({
+    initial: null,
+    monthly: null,
+    months: null,
+    cdi: null,
+    percent: null,
+    final: null,
+  });
 
   const [fields, setFields] = useState<Record<CalculatorFieldKey, string>>(INITIAL_FIELDS);
   const [error, setError] = useState<string | null>(null);
@@ -91,6 +99,21 @@ export default function LciLcaCalculatorScreen() {
   const [storedCdiRate, setStoredCdiRate] = useState<number | null>(null);
   const [projectionDetails, setProjectionDetails] = useState<LciLcaProjectionResult | null>(null);
   const [shareData, setShareData] = useState<LCILCAShareData | null>(null);
+  const summaryOffsetY = useRef<number | null>(null);
+
+  // Auto-scroll to results when projection details change
+  useEffect(() => {
+    if (projectionDetails) {
+      setTimeout(() => {
+        const y = summaryOffsetY.current;
+        if (y != null) {
+          scrollViewRef.current?.scrollToPosition(0, y, true);
+        } else {
+          scrollViewRef.current?.scrollToPosition(0, 600, true);
+        }
+      }, 300);
+    }
+  }, [projectionDetails]);
 
   useEffect(() => {
     let isMounted = true;
@@ -128,6 +151,22 @@ export default function LciLcaCalculatorScreen() {
     return () => {
       isMounted = false;
     };
+  }, []);
+
+  const focusNextInput = useCallback((currentField: CalculatorFieldKey) => {
+    const fieldOrder: CalculatorFieldKey[] = [
+      'initial',
+      'monthly',
+      'months',
+      'cdi',
+      'percent',
+      'final',
+    ];
+    const currentIndex = fieldOrder.indexOf(currentField);
+    if (currentIndex < fieldOrder.length - 1) {
+      const nextField = fieldOrder[currentIndex + 1];
+      inputRefs.current[nextField]?.focus();
+    }
   }, []);
 
   const handleChange = useCallback((key: CalculatorFieldKey, value: string) => {
@@ -190,6 +229,7 @@ export default function LciLcaCalculatorScreen() {
     setError(null);
     setInfo(null);
     setProjectionDetails(null);
+    Keyboard.dismiss();
 
     const emptyFields = (Object.entries(fields) as [CalculatorFieldKey, string][]).filter(
       ([, value]) => value.trim().length === 0,
@@ -261,6 +301,7 @@ export default function LciLcaCalculatorScreen() {
   return (
     <ThemedView style={styles.screen}>
       <KeyboardAwareScrollView
+        ref={scrollViewRef}
         contentContainerStyle={styles.content}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
@@ -269,10 +310,14 @@ export default function LciLcaCalculatorScreen() {
         style={styles.flex}>
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
+            ref={(ref) => {
+              inputRefs.current.initial = ref;
+            }}
             label="Valor inicial (R$)"
             tooltip={TOOLTIPS.initial}
             value={fields.initial}
             onChangeText={(text) => handleChange('initial', text)}
+            onSubmitEditing={() => focusNextInput('initial')}
             placeholder="Ex: 15.000,00"
             onClear={() => handleChange('initial', '')}
             palette={palette}
@@ -289,10 +334,14 @@ export default function LciLcaCalculatorScreen() {
 
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
+            ref={(ref) => {
+              inputRefs.current.monthly = ref;
+            }}
             label="Valor mensal (R$)"
             tooltip={TOOLTIPS.monthly}
             value={fields.monthly}
             onChangeText={(text) => handleChange('monthly', text)}
+            onSubmitEditing={() => focusNextInput('monthly')}
             placeholder="Ex: 800,00"
             onClear={() => handleChange('monthly', '')}
             palette={palette}
@@ -309,9 +358,14 @@ export default function LciLcaCalculatorScreen() {
 
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
+            ref={(ref) => {
+              inputRefs.current.months = ref;
+            }}
             label="Prazo em meses"
+            tooltip={TOOLTIPS.months}
             value={fields.months}
             onChangeText={(text) => handleChange('months', text.replace(/[^0-9]/g, ''))}
+            onSubmitEditing={() => focusNextInput('months')}
             placeholder="Ex: 36"
             onClear={() => handleChange('months', '')}
             palette={palette}
@@ -328,10 +382,14 @@ export default function LciLcaCalculatorScreen() {
           />
         </ThemedView>
         <CalculatorInput
+          ref={(ref) => {
+            inputRefs.current.cdi = ref;
+          }}
           label="Taxa (CDI anual %)"
           tooltip={TOOLTIPS.cdi}
           value={fields.cdi}
           onChangeText={(text) => handleChange('cdi', text)}
+          onSubmitEditing={() => focusNextInput('cdi')}
           placeholder={isFetchingCdi ? 'Carregando CDI...' : 'Ex: 13.65'}
           helper={
             storedCdiRate ? 'Atualizada automaticamente com a última taxa disponível.' : undefined
@@ -344,10 +402,14 @@ export default function LciLcaCalculatorScreen() {
         />
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
+            ref={(ref) => {
+              inputRefs.current.percent = ref;
+            }}
             label="Percentual do CDI (%)"
             tooltip={TOOLTIPS.percent}
             value={fields.percent}
             onChangeText={(text) => handleChange('percent', text)}
+            onSubmitEditing={() => focusNextInput('percent')}
             placeholder="Ex: 95"
             onClear={() => handleChange('percent', '')}
             palette={palette}
@@ -363,10 +425,14 @@ export default function LciLcaCalculatorScreen() {
           />
         </ThemedView>
         <CalculatorInput
+          ref={(ref) => {
+            inputRefs.current.final = ref;
+          }}
           label="Valor final (R$)"
           tooltip={TOOLTIPS.final}
           value={fields.final}
           onChangeText={(text) => handleChange('final', text)}
+          onSubmitEditing={handleCalculate}
           placeholder="Ex: 32.500,00"
           onClear={() => handleChange('final', '')}
           palette={palette}
@@ -376,15 +442,20 @@ export default function LciLcaCalculatorScreen() {
         />
 
         {projectionDetails ? (
-          <TaxFreeSummary
-            palette={palette}
-            details={projectionDetails}
-            borderColor={palette.tint}
-            cardStyle={styles.summaryCard}
-            labelStyle={styles.summaryLabel}
-            valueStyle={styles.summaryValue}
-            shareData={shareData ?? undefined}
-          />
+          <ThemedView
+            onLayout={(e) => {
+              summaryOffsetY.current = e.nativeEvent.layout.y;
+            }}>
+            <TaxFreeSummary
+              palette={palette}
+              details={projectionDetails}
+              borderColor={palette.tint}
+              cardStyle={styles.summaryCard}
+              labelStyle={styles.summaryLabel}
+              valueStyle={styles.summaryValue}
+              shareData={shareData ?? undefined}
+            />
+          </ThemedView>
         ) : null}
 
         {error ? <ThemedText style={styles.error}>{error}</ThemedText> : null}
