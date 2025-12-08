@@ -264,56 +264,64 @@ export default function CdbCalculatorScreen() {
         enableOnAndroid
         extraScrollHeight={extraScrollHeight}
         style={styles.flex}>
-        <CalculatorInput
-          label="Valor inicial (R$)"
-          value={fields.initial}
-          onChangeText={(text) => handleChange('initial', text)}
-          placeholder="Ex: 10.000,00"
-          onClear={() => handleChange('initial', '')}
-          palette={palette}
-          containerStyle={styles.inputGroup}
-          labelStyle={styles.label}
-          helperStyle={styles.helper}
-        />
-        <InputSteppers
-          options={VALUE_STEPPERS}
-          onStep={(value) => handleStepValue('initial', value)}
-          palette={palette}
-        />
-        <CalculatorInput
-          label="Valor mensal (R$)"
-          value={fields.monthly}
-          onChangeText={(text) => handleChange('monthly', text)}
-          placeholder="Ex: 1.000,00"
-          onClear={() => handleChange('monthly', '')}
-          palette={palette}
-          containerStyle={styles.inputGroup}
-          labelStyle={styles.label}
-          helperStyle={styles.helper}
-        />
-        <InputSteppers
-          options={VALUE_STEPPERS}
-          onStep={(value) => handleStepValue('monthly', value)}
-          palette={palette}
-        />
-        <CalculatorInput
-          label="Prazo em meses"
-          value={fields.months}
-          onChangeText={(text) => handleChange('months', text.replace(/[^0-9]/g, ''))}
-          placeholder="Ex: 24"
-          onClear={() => handleChange('months', '')}
-          palette={palette}
-          containerStyle={styles.inputGroup}
-          labelStyle={styles.label}
-          helperStyle={styles.helper}
-        />
-        <InputSteppers options={MONTHS_STEPPERS} onStep={handleStepMonths} palette={palette} />
-        <PresetChips
-          options={MONTHS_PRESETS}
-          onSelect={(value) => handleChange('months', value)}
-          palette={palette}
-          selectedValue={fields.months}
-        />
+        <ThemedView style={styles.fieldGroup}>
+          <CalculatorInput
+            label="Valor inicial (R$)"
+            value={fields.initial}
+            onChangeText={(text) => handleChange('initial', text)}
+            placeholder="Ex: 10.000,00"
+            onClear={() => handleChange('initial', '')}
+            palette={palette}
+            containerStyle={styles.inputGroup}
+            labelStyle={styles.label}
+            helperStyle={styles.helper}
+          />
+          <InputSteppers
+            options={VALUE_STEPPERS}
+            onStep={(value) => handleStepValue('initial', value)}
+            palette={palette}
+          />
+        </ThemedView>
+
+        <ThemedView style={styles.fieldGroup}>
+          <CalculatorInput
+            label="Valor mensal (R$)"
+            value={fields.monthly}
+            onChangeText={(text) => handleChange('monthly', text)}
+            placeholder="Ex: 1.000,00"
+            onClear={() => handleChange('monthly', '')}
+            palette={palette}
+            containerStyle={styles.inputGroup}
+            labelStyle={styles.label}
+            helperStyle={styles.helper}
+          />
+          <InputSteppers
+            options={VALUE_STEPPERS}
+            onStep={(value) => handleStepValue('monthly', value)}
+            palette={palette}
+          />
+        </ThemedView>
+
+        <ThemedView style={styles.fieldGroup}>
+          <CalculatorInput
+            label="Prazo em meses"
+            value={fields.months}
+            onChangeText={(text) => handleChange('months', text.replace(/[^0-9]/g, ''))}
+            placeholder="Ex: 24"
+            onClear={() => handleChange('months', '')}
+            palette={palette}
+            containerStyle={styles.inputGroup}
+            labelStyle={styles.label}
+            helperStyle={styles.helper}
+          />
+          <InputSteppers options={MONTHS_STEPPERS} onStep={handleStepMonths} palette={palette} />
+          <PresetChips
+            options={MONTHS_PRESETS}
+            onSelect={(value) => handleChange('months', value)}
+            palette={palette}
+            selectedValue={fields.months}
+          />
+        </ThemedView>
         <CalculatorInput
           label="Taxa (CDI anual %)"
           value={fields.cdi}
@@ -328,23 +336,25 @@ export default function CdbCalculatorScreen() {
           labelStyle={styles.label}
           helperStyle={styles.helper}
         />
-        <CalculatorInput
-          label="Percentual do CDI (%)"
-          value={fields.percent}
-          onChangeText={(text) => handleChange('percent', text)}
-          placeholder="Ex: 110"
-          onClear={() => handleChange('percent', '')}
-          palette={palette}
-          containerStyle={styles.inputGroup}
-          labelStyle={styles.label}
-          helperStyle={styles.helper}
-        />
-        <PresetChips
-          options={PERCENT_PRESETS}
-          onSelect={(value) => handleChange('percent', value)}
-          palette={palette}
-          selectedValue={fields.percent}
-        />
+        <ThemedView style={styles.fieldGroup}>
+          <CalculatorInput
+            label="Percentual do CDI (%)"
+            value={fields.percent}
+            onChangeText={(text) => handleChange('percent', text)}
+            placeholder="Ex: 110"
+            onClear={() => handleChange('percent', '')}
+            palette={palette}
+            containerStyle={styles.inputGroup}
+            labelStyle={styles.label}
+            helperStyle={styles.helper}
+          />
+          <PresetChips
+            options={PERCENT_PRESETS}
+            onSelect={(value) => handleChange('percent', value)}
+            palette={palette}
+            selectedValue={fields.percent}
+          />
+        </ThemedView>
         <CalculatorInput
           label="Valor bruto final (R$)"
           value={fields.final}

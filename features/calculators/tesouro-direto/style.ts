@@ -11,10 +11,13 @@ export const styles = StyleSheet.create({
   },
   content: {
     paddingBottom: 40,
-    gap: 24,
+    gap: 8,
+  },
+  fieldGroup: {
+    gap: 4,
   },
   inputGroup: {
-    gap: 8,
+    gap: 4,
   },
   label: {
     fontSize: 13,

@@ -61,8 +61,8 @@ export function InputSteppers({ options, onStep, palette }: InputSteppersProps) 
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: 8,
-    marginBottom: 8,
+    marginTop: 4,
+    marginBottom: 4,
   },
   buttonGroup: {
     flexDirection: 'row',

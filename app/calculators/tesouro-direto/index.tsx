@@ -417,56 +417,64 @@ export default function TesouroCalculatorScreen() {
           </RadioGroup>
         </ThemedView>
 
-        <CalculatorInput
-          label="Valor inicial (R$)"
-          value={fields.initial}
-          onChangeText={(text) => handleChange('initial', text)}
-          placeholder="Ex: 5.000,00"
-          onClear={() => handleChange('initial', '')}
-          palette={palette}
-          containerStyle={styles.inputGroup}
-          labelStyle={styles.label}
-          helperStyle={styles.helper}
-        />
-        <InputSteppers
-          options={VALUE_STEPPERS}
-          onStep={(value) => handleStepValue('initial', value)}
-          palette={palette}
-        />
-        <CalculatorInput
-          label="Valor mensal (R$)"
-          value={fields.monthly}
-          onChangeText={(text) => handleChange('monthly', text)}
-          placeholder="Ex: 300,00"
-          onClear={() => handleChange('monthly', '')}
-          palette={palette}
-          containerStyle={styles.inputGroup}
-          labelStyle={styles.label}
-          helperStyle={styles.helper}
-        />
-        <InputSteppers
-          options={VALUE_STEPPERS}
-          onStep={(value) => handleStepValue('monthly', value)}
-          palette={palette}
-        />
-        <CalculatorInput
-          label="Prazo em meses"
-          value={fields.months}
-          onChangeText={(text) => handleChange('months', text)}
-          placeholder="Ex: 60"
-          onClear={() => handleChange('months', '')}
-          palette={palette}
-          containerStyle={styles.inputGroup}
-          labelStyle={styles.label}
-          helperStyle={styles.helper}
-        />
-        <InputSteppers options={MONTHS_STEPPERS} onStep={handleStepMonths} palette={palette} />
-        <PresetChips
-          options={MONTHS_PRESETS}
-          onSelect={(value) => handleChange('months', value)}
-          palette={palette}
-          selectedValue={fields.months}
-        />
+        <ThemedView style={styles.fieldGroup}>
+          <CalculatorInput
+            label="Valor inicial (R$)"
+            value={fields.initial}
+            onChangeText={(text) => handleChange('initial', text)}
+            placeholder="Ex: 5.000,00"
+            onClear={() => handleChange('initial', '')}
+            palette={palette}
+            containerStyle={styles.inputGroup}
+            labelStyle={styles.label}
+            helperStyle={styles.helper}
+          />
+          <InputSteppers
+            options={VALUE_STEPPERS}
+            onStep={(value) => handleStepValue('initial', value)}
+            palette={palette}
+          />
+        </ThemedView>
+
+        <ThemedView style={styles.fieldGroup}>
+          <CalculatorInput
+            label="Valor mensal (R$)"
+            value={fields.monthly}
+            onChangeText={(text) => handleChange('monthly', text)}
+            placeholder="Ex: 300,00"
+            onClear={() => handleChange('monthly', '')}
+            palette={palette}
+            containerStyle={styles.inputGroup}
+            labelStyle={styles.label}
+            helperStyle={styles.helper}
+          />
+          <InputSteppers
+            options={VALUE_STEPPERS}
+            onStep={(value) => handleStepValue('monthly', value)}
+            palette={palette}
+          />
+        </ThemedView>
+
+        <ThemedView style={styles.fieldGroup}>
+          <CalculatorInput
+            label="Prazo em meses"
+            value={fields.months}
+            onChangeText={(text) => handleChange('months', text)}
+            placeholder="Ex: 60"
+            onClear={() => handleChange('months', '')}
+            palette={palette}
+            containerStyle={styles.inputGroup}
+            labelStyle={styles.label}
+            helperStyle={styles.helper}
+          />
+          <InputSteppers options={MONTHS_STEPPERS} onStep={handleStepMonths} palette={palette} />
+          <PresetChips
+            options={MONTHS_PRESETS}
+            onSelect={(value) => handleChange('months', value)}
+            palette={palette}
+            selectedValue={fields.months}
+          />
+        </ThemedView>
         <CalculatorInput
           label="Valor bruto final (R$)"
           value={fields.final}
