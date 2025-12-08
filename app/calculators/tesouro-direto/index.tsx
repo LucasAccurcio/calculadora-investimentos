@@ -48,11 +48,11 @@ const MODALITY_OPTIONS: { value: TesouroModality; title: string; description: st
 ];
 
 const MONTHS_PRESETS: PresetOption[] = [
-  { label: '12m', value: '12' },
-  { label: '24m', value: '24' },
-  { label: '36m', value: '36' },
-  { label: '60m', value: '60' },
-  { label: '120m', value: '120' },
+  { label: '1 ano', value: '12' },
+  { label: '2 anos', value: '24' },
+  { label: '3 anos', value: '36' },
+  { label: '5 anos', value: '60' },
+  { label: '10 anos', value: '120' },
 ];
 
 const MONTHS_STEPPERS: StepperOption[] = [
@@ -73,6 +73,17 @@ const IPCA_REAL_PRESETS: PresetOption[] = [
   { label: 'IPCA+ 6%', value: '6' },
   { label: 'IPCA+ 7%', value: '7' },
 ];
+
+const TOOLTIPS = {
+  initial: 'Valor inicial a ser investido em Tesouro Direto.',
+  monthly: 'Contribuição mensal ao longo do investimento.',
+  months: 'Prazo em meses. Tesouro Direto permite prazos variáveis de 1 a 40+ anos.',
+  selic: 'Taxa Selic é a taxa básica de juros da economia. Use a projeção média para o período.',
+  prefixRate: 'Taxa fixa contratada no momento da compra.',
+  ipcaRate: 'Inflação estimada. Use a projeção IPCA para o período.',
+  realRate: 'Taxa real adicional ao IPCA. Combina com inflação para rentabilidade total.',
+  final: 'Valor total esperado. Deixe em branco para calcular automaticamente.',
+} satisfies Record<string, string>;
 
 type TesouroFieldKey =
   | 'initial'
@@ -420,6 +431,7 @@ export default function TesouroCalculatorScreen() {
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
             label="Valor inicial (R$)"
+            tooltip={TOOLTIPS.initial}
             value={fields.initial}
             onChangeText={(text) => handleChange('initial', text)}
             placeholder="Ex: 5.000,00"
@@ -439,6 +451,7 @@ export default function TesouroCalculatorScreen() {
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
             label="Valor mensal (R$)"
+            tooltip={TOOLTIPS.monthly}
             value={fields.monthly}
             onChangeText={(text) => handleChange('monthly', text)}
             placeholder="Ex: 300,00"
@@ -458,6 +471,7 @@ export default function TesouroCalculatorScreen() {
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
             label="Prazo em meses"
+            tooltip={TOOLTIPS.months}
             value={fields.months}
             onChangeText={(text) => handleChange('months', text)}
             placeholder="Ex: 60"
@@ -477,6 +491,7 @@ export default function TesouroCalculatorScreen() {
         </ThemedView>
         <CalculatorInput
           label="Valor bruto final (R$)"
+          tooltip={TOOLTIPS.final}
           value={fields.final}
           onChangeText={(text) => handleChange('final', text)}
           placeholder="Ex: 80.000,00"
@@ -491,6 +506,7 @@ export default function TesouroCalculatorScreen() {
         {modality === 'selic' ? (
           <CalculatorInput
             label="Taxa Selic anual (%)"
+            tooltip={TOOLTIPS.selic}
             value={fields.selicRate}
             onChangeText={(text) => handleChange('selicRate', text)}
             placeholder="Ex: 10.75"
@@ -506,6 +522,7 @@ export default function TesouroCalculatorScreen() {
         {modality === 'prefixado' ? (
           <CalculatorInput
             label="Taxa prefixada anual (%)"
+            tooltip={TOOLTIPS.prefixRate}
             value={fields.prefixRate}
             onChangeText={(text) => handleChange('prefixRate', text)}
             placeholder="Ex: 9.50"
@@ -522,6 +539,7 @@ export default function TesouroCalculatorScreen() {
           <>
             <CalculatorInput
               label="IPCA anual estimado (%)"
+              tooltip={TOOLTIPS.ipcaRate}
               value={fields.ipcaRate}
               onChangeText={(text) => handleChange('ipcaRate', text)}
               placeholder="Ex: 4.00"
@@ -534,6 +552,7 @@ export default function TesouroCalculatorScreen() {
             />
             <CalculatorInput
               label="Taxa adicional do IPCA (% a.a)"
+              tooltip={TOOLTIPS.realRate}
               value={fields.realRate}
               onChangeText={(text) => handleChange('realRate', text)}
               placeholder="Ex: 5.00"

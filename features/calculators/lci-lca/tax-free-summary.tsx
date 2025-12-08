@@ -2,10 +2,11 @@ import { ShareResultFooter } from '@/components/share-result';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
+import { Badge } from '@/features/calculators/components/badge';
 import {
-	formatCurrencyFromNumber,
-	formatPercent,
-	LciLcaProjectionResult,
+  formatCurrencyFromNumber,
+  formatPercent,
+  LciLcaProjectionResult,
 } from '@/features/calculators/utils';
 import { formatShareText, shareProjection, type LCILCAShareData } from '@/features/shared/share';
 import { type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
@@ -13,58 +14,59 @@ import { type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import { styles } from './style';
 
 export type TaxFreeSummaryProps = {
-	palette: (typeof Colors)['light'];
-	details: LciLcaProjectionResult;
-	borderColor: string;
-	cardStyle?: StyleProp<ViewStyle>;
-	labelStyle?: StyleProp<TextStyle>;
-	valueStyle?: StyleProp<TextStyle>;
-	shareData?: LCILCAShareData;
+  palette: (typeof Colors)['light'];
+  details: LciLcaProjectionResult;
+  borderColor: string;
+  cardStyle?: StyleProp<ViewStyle>;
+  labelStyle?: StyleProp<TextStyle>;
+  valueStyle?: StyleProp<TextStyle>;
+  shareData?: LCILCAShareData;
 };
 
 export function TaxFreeSummary({
-	palette,
-	details,
-	borderColor,
-	cardStyle,
-	labelStyle,
-	valueStyle,
-	shareData,
+  palette,
+  details,
+  borderColor,
+  cardStyle,
+  labelStyle,
+  valueStyle,
+  shareData,
 }: TaxFreeSummaryProps) {
-	const handleShare = async () => {
-		if (!shareData) return;
-		const text = formatShareText('lci-lca', shareData);
-		await shareProjection(text);
-	};
-	return (
-		<ThemedView
-			style={[cardStyle, { borderColor, backgroundColor: styles.tipCard.backgroundColor }]}
-			accessibilityLabel="Resumo da projeção para LCI/LCA">
-			<ThemedText style={[labelStyle, { color: palette.icon }]}>Valor final estimado</ThemedText>
-			<ThemedText style={[valueStyle, { color: palette.text }]}>
-				{formatCurrencyFromNumber(details.net)}
-			</ThemedText>
-			<ThemedText style={[labelStyle, { color: palette.icon }]}>Total investido</ThemedText>
-			<ThemedText style={[valueStyle, { color: palette.text }]}>
-				{formatCurrencyFromNumber(details.contributions)}
-			</ThemedText>
-			<ThemedText style={[labelStyle, { color: palette.icon }]}>Rendimento estimado</ThemedText>
-			<ThemedText style={[valueStyle, { color: palette.text }]}>
-				{formatCurrencyFromNumber(details.earnings)}
-			</ThemedText>
-			<ThemedText style={[labelStyle, { color: palette.icon }]}>Rentabilidade mensal</ThemedText>
-			<ThemedText style={[valueStyle, { color: palette.text }]}>
-				{formatPercent(details.monthlyRate * 100)}
-			</ThemedText>
-			<ThemedText style={[labelStyle, { color: palette.icon }]}>
-				Rentabilidade anual equivalente
-			</ThemedText>
-			<ThemedText style={[valueStyle, { color: palette.text }]}>
-				{formatPercent((Math.pow(1 + details.monthlyRate, 12) - 1) * 100)}
-			</ThemedText>
-			{shareData ? (
-				<ShareResultFooter palette={palette} onShare={handleShare} />
-			) : null}
-		</ThemedView>
-	);
+  const handleShare = async () => {
+    if (!shareData) return;
+    const text = formatShareText('lci-lca', shareData);
+    await shareProjection(text);
+  };
+  return (
+    <ThemedView
+      style={[cardStyle, { borderColor, backgroundColor: styles.tipCard.backgroundColor }]}
+      accessibilityLabel="Resumo da projeção para LCI/LCA">
+      <ThemedView style={{ gap: 8, marginBottom: 12 }}>
+        <Badge label="Isento de IR" variant="success" palette={palette} />
+        <ThemedText style={[labelStyle, { color: palette.icon }]}>Valor final estimado</ThemedText>
+        <ThemedText style={[valueStyle, { color: palette.text }]}>
+          {formatCurrencyFromNumber(details.net)}
+        </ThemedText>
+      </ThemedView>
+      <ThemedText style={[labelStyle, { color: palette.icon }]}>Total investido</ThemedText>
+      <ThemedText style={[valueStyle, { color: palette.text }]}>
+        {formatCurrencyFromNumber(details.contributions)}
+      </ThemedText>
+      <ThemedText style={[labelStyle, { color: palette.icon }]}>Rendimento estimado</ThemedText>
+      <ThemedText style={[valueStyle, { color: palette.text }]}>
+        {formatCurrencyFromNumber(details.earnings)}
+      </ThemedText>
+      <ThemedText style={[labelStyle, { color: palette.icon }]}>Rentabilidade mensal</ThemedText>
+      <ThemedText style={[valueStyle, { color: palette.text }]}>
+        {formatPercent(details.monthlyRate * 100)}
+      </ThemedText>
+      <ThemedText style={[labelStyle, { color: palette.icon }]}>
+        Rentabilidade anual equivalente
+      </ThemedText>
+      <ThemedText style={[valueStyle, { color: palette.text }]}>
+        {formatPercent((Math.pow(1 + details.monthlyRate, 12) - 1) * 100)}
+      </ThemedText>
+      {shareData ? <ShareResultFooter palette={palette} onShare={handleShare} /> : null}
+    </ThemedView>
+  );
 }

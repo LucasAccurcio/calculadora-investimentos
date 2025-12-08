@@ -43,11 +43,11 @@ const INITIAL_FIELDS: Record<CalculatorFieldKey, string> = {
 };
 
 const MONTHS_PRESETS: PresetOption[] = [
-  { label: '12m', value: '12' },
-  { label: '24m', value: '24' },
-  { label: '36m', value: '36' },
-  { label: '60m', value: '60' },
-  { label: '120m', value: '120' },
+  { label: '1 ano', value: '12' },
+  { label: '2 anos', value: '24' },
+  { label: '3 anos', value: '36' },
+  { label: '5 anos', value: '60' },
+  { label: '10 anos', value: '120' },
 ];
 
 const MONTHS_STEPPERS: StepperOption[] = [
@@ -61,6 +61,15 @@ const VALUE_STEPPERS: StepperOption[] = [
   { label: '+R$ 500', value: 500, icon: 'plus' },
   { label: '+R$ 1.000', value: 1000, icon: 'plus' },
 ];
+
+const TOOLTIPS = {
+  initial: 'Valor inicial a ser investido no CDB.',
+  monthly: 'Contribuição mensal ao longo do investimento.',
+  months: 'Lembre-se que o imposto de renda varia conforme o prazo.',
+  cdi: 'Taxa CDI (Certificado de Depósito Interbancário) é a taxa média de juros entre bancos.',
+  percent: 'Percentual do CDI oferecido pelo banco. Exemplo: 110% do CDI.',
+  final: 'Valor total esperado. Deixe em branco para calcular automaticamente.',
+} satisfies Record<CalculatorFieldKey, string>;
 
 const PERCENT_PRESETS: PresetOption[] = [
   { label: '100% CDI', value: '100' },
@@ -267,6 +276,7 @@ export default function CdbCalculatorScreen() {
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
             label="Valor inicial (R$)"
+            tooltip={TOOLTIPS.initial}
             value={fields.initial}
             onChangeText={(text) => handleChange('initial', text)}
             placeholder="Ex: 10.000,00"
@@ -286,6 +296,7 @@ export default function CdbCalculatorScreen() {
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
             label="Valor mensal (R$)"
+            tooltip={TOOLTIPS.monthly}
             value={fields.monthly}
             onChangeText={(text) => handleChange('monthly', text)}
             placeholder="Ex: 1.000,00"
@@ -305,6 +316,7 @@ export default function CdbCalculatorScreen() {
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
             label="Prazo em meses"
+            tooltip={TOOLTIPS.months}
             value={fields.months}
             onChangeText={(text) => handleChange('months', text.replace(/[^0-9]/g, ''))}
             placeholder="Ex: 24"
@@ -324,6 +336,7 @@ export default function CdbCalculatorScreen() {
         </ThemedView>
         <CalculatorInput
           label="Taxa (CDI anual %)"
+          tooltip={TOOLTIPS.cdi}
           value={fields.cdi}
           onChangeText={(text) => handleChange('cdi', text)}
           placeholder={isFetchingCdi ? 'Carregando CDI...' : 'Ex: 13.65'}
@@ -339,6 +352,7 @@ export default function CdbCalculatorScreen() {
         <ThemedView style={styles.fieldGroup}>
           <CalculatorInput
             label="Percentual do CDI (%)"
+            tooltip={TOOLTIPS.percent}
             value={fields.percent}
             onChangeText={(text) => handleChange('percent', text)}
             placeholder="Ex: 110"
@@ -357,6 +371,7 @@ export default function CdbCalculatorScreen() {
         </ThemedView>
         <CalculatorInput
           label="Valor bruto final (R$)"
+          tooltip={TOOLTIPS.final}
           value={fields.final}
           onChangeText={(text) => handleChange('final', text)}
           placeholder="Ex: 45.000,00"

@@ -2,6 +2,7 @@ import { ShareResultFooter } from '@/components/share-result';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
+import { Badge } from '@/features/calculators/components/badge';
 import {
   ProjectionResult,
   formatCurrencyFromNumber,
@@ -42,10 +43,15 @@ export function ProjectionSummary({
     <ThemedView
       style={[cardStyle, { borderColor, backgroundColor: styles.tipCard.backgroundColor }]}
       accessibilityLabel="Resumo da projeção do investimento">
-      <ThemedText style={[labelStyle, { color: palette.icon }]}>Valor líquido estimado</ThemedText>
-      <ThemedText style={[valueStyle, { color: palette.text }]}>
-        {formatCurrencyFromNumber(details.net)}
-      </ThemedText>
+      <ThemedView style={{ gap: 8, marginBottom: 12 }}>
+        <Badge label="Tributado" variant="warning" palette={palette} />
+        <ThemedText style={[labelStyle, { color: palette.icon }]}>
+          Valor líquido estimado
+        </ThemedText>
+        <ThemedText style={[valueStyle, { color: palette.text }]}>
+          {formatCurrencyFromNumber(details.net)}
+        </ThemedText>
+      </ThemedView>
       <ThemedText style={[labelStyle, { color: palette.icon }]}>Valor bruto estimado</ThemedText>
       <ThemedText style={[valueStyle, { color: palette.text }]}>
         {formatCurrencyFromNumber(details.gross)}
