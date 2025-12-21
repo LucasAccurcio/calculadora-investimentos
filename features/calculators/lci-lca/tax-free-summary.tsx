@@ -3,12 +3,16 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import { Badge } from '@/features/calculators/components/badge';
+import { GrowthChart } from '@/features/calculators/components/growth-chart';
 import {
   formatCurrencyFromNumber,
   formatPercent,
   LciLcaProjectionResult,
+  ProjectionInputs,
 } from '@/features/calculators/utils';
+import { buildLciLcaSeries } from '@/features/calculators/utils/series-generators';
 import { formatShareText, shareProjection, type LCILCAShareData } from '@/features/shared/share';
+import { ProGate } from '@/features/subscription';
 import { type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 
 import { styles } from './style';
@@ -16,6 +20,7 @@ import { styles } from './style';
 export type TaxFreeSummaryProps = {
   palette: (typeof Colors)['light'];
   details: LciLcaProjectionResult;
+  inputs: ProjectionInputs;
   borderColor: string;
   cardStyle?: StyleProp<ViewStyle>;
   labelStyle?: StyleProp<TextStyle>;
@@ -26,6 +31,7 @@ export type TaxFreeSummaryProps = {
 export function TaxFreeSummary({
   palette,
   details,
+  inputs,
   borderColor,
   cardStyle,
   labelStyle,
@@ -67,6 +73,16 @@ export function TaxFreeSummary({
         {formatPercent((Math.pow(1 + details.monthlyRate, 12) - 1) * 100)}
       </ThemedText>
       {shareData ? <ShareResultFooter palette={palette} onShare={handleShare} /> : null}
+
+      {/* Premium: Growth Chart */}
+      <ThemedView style={{ marginTop: 16, backgroundColor: 'transparent' }}>
+        <ProGate>
+          <GrowthChart
+            data={buildLciLcaSeries(details, inputs)}
+            title="Evolução do Investimento LCI/LCA"
+          />
+        </ProGate>
+      </ThemedView>
     </ThemedView>
   );
 }

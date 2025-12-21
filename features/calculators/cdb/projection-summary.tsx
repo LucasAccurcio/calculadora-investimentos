@@ -3,18 +3,23 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import { Badge } from '@/features/calculators/components/badge';
+import { GrowthChart } from '@/features/calculators/components/growth-chart';
 import {
+  ProjectionInputs,
   ProjectionResult,
   formatCurrencyFromNumber,
   formatPercent,
 } from '@/features/calculators/utils';
+import { buildCdbSeries } from '@/features/calculators/utils/series-generators';
 import { formatShareText, shareProjection, type CDBShareData } from '@/features/shared/share';
+import { ProGate } from '@/features/subscription';
 import { type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import { styles } from './style';
 
 export type ProjectionSummaryProps = {
   palette: (typeof Colors)['light'];
   details: ProjectionResult;
+  inputs: ProjectionInputs;
   borderColor: string;
   cardStyle?: StyleProp<ViewStyle>;
   labelStyle?: StyleProp<TextStyle>;
@@ -25,6 +30,7 @@ export type ProjectionSummaryProps = {
 export function ProjectionSummary({
   palette,
   details,
+  inputs,
   borderColor,
   cardStyle,
   labelStyle,
@@ -85,6 +91,16 @@ export function ProjectionSummary({
         {formatCurrencyFromNumber(details.taxAmount)}
       </ThemedText>
       {shareData ? <ShareResultFooter palette={palette} onShare={handleShare} /> : null}
+
+      {/* Premium: Growth Chart */}
+      <ThemedView style={{ marginTop: 16, backgroundColor: 'transparent' }}>
+        <ProGate>
+          <GrowthChart
+            data={buildCdbSeries(details, inputs)}
+            title="Evolução do Investimento CDB"
+          />
+        </ProGate>
+      </ThemedView>
     </ThemedView>
   );
 }

@@ -3,19 +3,24 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Colors } from '@/constants/theme';
 import { Badge } from '@/features/calculators/components/badge';
+import { GrowthChart } from '@/features/calculators/components/growth-chart';
 import {
   formatCurrencyFromNumber,
   formatPercent,
-  type ProjectionResult,
+  type TesouroProjectionInputs,
+  type TesouroProjectionResult,
 } from '@/features/calculators/utils';
+import { buildTesouroSeries } from '@/features/calculators/utils/series-generators';
 import { formatShareText, shareProjection, type TesouroShareData } from '@/features/shared/share';
+import { ProGate } from '@/features/subscription';
 import { type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 
 import { styles } from './style';
 
 export type TesouroProjectionSummaryProps = {
   palette: (typeof Colors)['light'];
-  details: ProjectionResult;
+  details: TesouroProjectionResult;
+  inputs: TesouroProjectionInputs;
   borderColor: string;
   cardStyle?: StyleProp<ViewStyle>;
   labelStyle?: StyleProp<TextStyle>;
@@ -26,6 +31,7 @@ export type TesouroProjectionSummaryProps = {
 export function TesouroProjectionSummary({
   palette,
   details,
+  inputs,
   borderColor,
   cardStyle,
   labelStyle,
@@ -86,6 +92,16 @@ export function TesouroProjectionSummary({
         {formatCurrencyFromNumber(details.taxAmount)}
       </ThemedText>
       {shareData ? <ShareResultFooter palette={palette} onShare={handleShare} /> : null}
+
+      {/* Premium: Growth Chart */}
+      <ThemedView style={{ marginTop: 16, backgroundColor: 'transparent' }}>
+        <ProGate>
+          <GrowthChart
+            data={buildTesouroSeries(details, inputs)}
+            title="Evolução do Investimento Tesouro Direto"
+          />
+        </ProGate>
+      </ThemedView>
     </ThemedView>
   );
 }

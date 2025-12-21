@@ -28,6 +28,7 @@ import {
   type ProjectionInputs,
 } from '@/features/calculators/utils';
 import { type LCILCAShareData } from '@/features/shared/share';
+import { useSubscription } from '@/features/subscription';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Keyboard, Platform, Pressable } from 'react-native';
@@ -82,6 +83,7 @@ const extraScrollHeight = Platform.select({ ios: 32, android: 64, default: 48 })
 export default function LciLcaCalculatorScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const palette = Colors[colorScheme];
+  const { incrementCalculationCount } = useSubscription();
   const scrollViewRef = useRef<KeyboardAwareScrollView>(null);
   const inputRefs = useRef<Record<CalculatorFieldKey, any>>({
     initial: null,
@@ -98,12 +100,20 @@ export default function LciLcaCalculatorScreen() {
   const [isFetchingCdi, setIsFetchingCdi] = useState(true);
   const [storedCdiRate, setStoredCdiRate] = useState<number | null>(null);
   const [projectionDetails, setProjectionDetails] = useState<LciLcaProjectionResult | null>(null);
+  const [projectionInputs, setProjectionInputs] = useState<ProjectionInputs | null>(null);
   const [shareData, setShareData] = useState<LCILCAShareData | null>(null);
   const summaryOffsetY = useRef<number | null>(null);
+  const hasIncrementedRef = useRef(false);
 
   // Auto-scroll to results when projection details change
   useEffect(() => {
-    if (projectionDetails) {
+    if (projectionDetails && !hasIncrementedRef.current) {
+      // Increment calculation count for trial tracking (only once per projection)
+      hasIncrementedRef.current = true;
+      incrementCalculationCount().catch((err) => {
+        console.warn('Failed to increment calculation count:', err);
+      });
+
       setTimeout(() => {
         const y = summaryOffsetY.current;
         if (y != null) {
@@ -113,7 +123,7 @@ export default function LciLcaCalculatorScreen() {
         }
       }, 300);
     }
-  }, [projectionDetails]);
+  }, [projectionDetails, incrementCalculationCount]);
 
   useEffect(() => {
     let isMounted = true;
@@ -175,6 +185,8 @@ export default function LciLcaCalculatorScreen() {
     setError(null);
     setInfo(null);
     setProjectionDetails(null);
+    setProjectionInputs(null);
+    hasIncrementedRef.current = false;
   }, []);
 
   const handleStepValue = useCallback((key: CalculatorFieldKey, increment: number) => {
@@ -256,6 +268,7 @@ export default function LciLcaCalculatorScreen() {
       setFields((prev) => ({ ...prev, final: formatCurrencyFromNumber(result.net) }));
       setInfo('Valor final estimado com base na taxa informada (isento de IR).');
       setProjectionDetails(result);
+      setProjectionInputs(projectionInputs);
       setShareData({
         productName: 'LCI/LCA',
         invested: projectionInputs.initial,
@@ -287,6 +300,7 @@ export default function LciLcaCalculatorScreen() {
     setFields((prev) => ({ ...prev, [missing]: formattedValue }));
     setInfo('Campo calculado com sucesso (isenção automática considerada).');
     setProjectionDetails(projection);
+    setProjectionInputs(values as ProjectionInputs);
     setShareData({
       productName: 'LCI/LCA',
       invested: (values.initial as number) ?? 0,
@@ -441,7 +455,7 @@ export default function LciLcaCalculatorScreen() {
           helperStyle={styles.helper}
         />
 
-        {projectionDetails ? (
+        {projectionDetails && projectionInputs ? (
           <ThemedView
             onLayout={(e) => {
               summaryOffsetY.current = e.nativeEvent.layout.y;
@@ -449,6 +463,7 @@ export default function LciLcaCalculatorScreen() {
             <TaxFreeSummary
               palette={palette}
               details={projectionDetails}
+              inputs={projectionInputs}
               borderColor={palette.tint}
               cardStyle={styles.summaryCard}
               labelStyle={styles.summaryLabel}

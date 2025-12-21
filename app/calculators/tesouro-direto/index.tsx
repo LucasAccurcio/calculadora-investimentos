@@ -20,10 +20,12 @@ import {
   parseCurrency,
   solveTesouroMissingField,
   type TesouroModality,
+  type TesouroProjectionInputs,
   type TesouroProjectionResult,
   type TesouroSolvableField,
 } from '@/features/calculators/utils';
 import { type TesouroShareData } from '@/features/shared/share';
+import { useSubscription } from '@/features/subscription';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Keyboard, Platform, Pressable } from 'react-native';
@@ -120,6 +122,7 @@ const extraScrollHeight = Platform.select({ ios: 32, android: 64, default: 48 })
 export default function TesouroCalculatorScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const palette = Colors[colorScheme];
+  const { incrementCalculationCount } = useSubscription();
   const scrollViewRef = useRef<KeyboardAwareScrollView>(null);
   const inputRefs = useRef<Record<string, any>>({
     initial: null,
@@ -137,12 +140,20 @@ export default function TesouroCalculatorScreen() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
   const [projectionDetails, setProjectionDetails] = useState<TesouroProjectionResult | null>(null);
+  const [projectionInputs, setProjectionInputs] = useState<TesouroProjectionInputs | null>(null);
   const [shareData, setShareData] = useState<TesouroShareData | null>(null);
   const summaryOffsetY = useRef<number | null>(null);
+  const hasIncrementedRef = useRef(false);
 
   // Auto-scroll to results when projection details change
   useEffect(() => {
-    if (projectionDetails) {
+    if (projectionDetails && !hasIncrementedRef.current) {
+      // Increment calculation count for trial tracking (only once per projection)
+      hasIncrementedRef.current = true;
+      incrementCalculationCount().catch((err) => {
+        console.warn('Failed to increment calculation count:', err);
+      });
+
       setTimeout(() => {
         const y = summaryOffsetY.current;
         if (y != null) {
@@ -152,7 +163,7 @@ export default function TesouroCalculatorScreen() {
         }
       }, 300);
     }
-  }, [projectionDetails]);
+  }, [projectionDetails, incrementCalculationCount]);
 
   const handleChange = useCallback((key: TesouroFieldKey, value: string) => {
     let nextValue = value;
@@ -165,6 +176,8 @@ export default function TesouroCalculatorScreen() {
     setError(null);
     setInfo(null);
     setProjectionDetails(null);
+    setProjectionInputs(null);
+    hasIncrementedRef.current = false;
   }, []);
 
   const handleStepValue = useCallback((key: TesouroFieldKey, increment: number) => {
@@ -204,6 +217,7 @@ export default function TesouroCalculatorScreen() {
     setError(null);
     setInfo(null);
     setProjectionDetails(null);
+    setProjectionInputs(null);
     Keyboard.dismiss();
 
     const finalTrimmed = fields.final.trim();
@@ -281,7 +295,15 @@ export default function TesouroCalculatorScreen() {
           throw new Error('Não foi possível calcular a taxa mensal.');
         }
 
+        const projectionInputs: TesouroProjectionInputs = {
+          ...rateConfig,
+          initial,
+          monthly,
+          months,
+        };
+
         setProjectionDetails(result);
+        setProjectionInputs(projectionInputs);
         setFields((prev) => ({ ...prev, final: formatCurrencyFromNumber(result.gross) }));
         setInfo('Estimativa considera a taxa informada e a tabela regressiva de IR.');
         setShareData({
@@ -366,7 +388,15 @@ export default function TesouroCalculatorScreen() {
         months: resolvedMonths,
       });
 
+      const projectionInputs: TesouroProjectionInputs = {
+        ...rateConfig,
+        initial: resolvedInitial,
+        monthly: resolvedMonthly,
+        months: resolvedMonths,
+      };
+
       setProjectionDetails(projection);
+      setProjectionInputs(projectionInputs);
       setFields((prev) => ({
         ...prev,
         initial: formatCurrencyFromNumber(resolvedInitial),
@@ -648,7 +678,7 @@ export default function TesouroCalculatorScreen() {
           </>
         ) : null}
 
-        {projectionDetails ? (
+        {projectionDetails && projectionInputs ? (
           <ThemedView
             onLayout={(e) => {
               summaryOffsetY.current = e.nativeEvent.layout.y;
@@ -656,6 +686,7 @@ export default function TesouroCalculatorScreen() {
             <TesouroProjectionSummary
               palette={palette}
               details={projectionDetails}
+              inputs={projectionInputs}
               borderColor={palette.tint}
               cardStyle={[styles.summaryCard, { backgroundColor: summaryBackground }]}
               labelStyle={styles.summaryLabel}

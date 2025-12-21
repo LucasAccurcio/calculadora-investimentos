@@ -13,9 +13,11 @@ import {
   AccordionTitleText,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Button, ButtonGroup, ButtonText } from '@/components/ui/button';
 import { Divider } from '@/components/ui/divider';
 import { ChevronDownIcon, CircleIcon } from '@/components/ui/icon';
 import { Radio, RadioGroup, RadioIcon, RadioIndicator, RadioLabel } from '@/components/ui/radio';
+import { useSubscription } from '@/features/subscription/context';
 import {
   type FontScaleOption,
   type ThemePreference,
@@ -68,6 +70,15 @@ const FONT_OPTIONS: Option<FontScaleOption>[] = [
 export function PreferencesAccordion({ palette }: PreferencesAccordionProps) {
   const { themePreference, setThemePreference, fontScale, setFontScale, hydrated } =
     usePreferences();
+  const {
+    isPro,
+    status,
+    trial,
+    canAccessPremiumFeatures,
+    toggleProMock,
+    resetTrial,
+    isLoading: subLoading,
+  } = useSubscription();
 
   const handleThemeChange = useCallback(
     (nextValue: ThemePreference) => {
@@ -141,6 +152,53 @@ export function PreferencesAccordion({ palette }: PreferencesAccordionProps) {
             </RadioGroup>
           </AccordionContent>
         </AccordionItem>
+
+        {__DEV__ && (
+          <>
+            <Divider />
+            <AccordionItem value="dev-subscription">
+              <AccordionHeader>
+                <AccordionTrigger>
+                  <AccordionTitleText>Assinatura (Dev)</AccordionTitleText>
+                  <AccordionIcon as={ChevronDownIcon} />
+                </AccordionTrigger>
+              </AccordionHeader>
+              <AccordionContent>
+                <AccordionContentText>
+                  Estado atual: {isPro ? 'Pro' : status === 'trial' ? 'Trial' : 'Expirado'}
+                </AccordionContentText>
+                <AccordionContentText>
+                  Acesso premium: {canAccessPremiumFeatures ? 'Sim' : 'Não'}
+                </AccordionContentText>
+                {trial && (
+                  <AccordionContentText>
+                    Trial: {trial.daysRemaining} dias restantes · {trial.calculationsUsed}/
+                    {trial.maxCalculationsInTrial} cálculos
+                  </AccordionContentText>
+                )}
+
+                <ButtonGroup className="mt-3" flexDirection="row" space="sm">
+                  <Button
+                    onPress={toggleProMock}
+                    action="secondary"
+                    variant="outline"
+                    size="sm"
+                    disabled={subLoading}>
+                    <ButtonText>Alternar Pro</ButtonText>
+                  </Button>
+                  <Button
+                    onPress={resetTrial}
+                    action="negative"
+                    variant="outline"
+                    size="sm"
+                    disabled={subLoading}>
+                    <ButtonText>Reiniciar Trial</ButtonText>
+                  </Button>
+                </ButtonGroup>
+              </AccordionContent>
+            </AccordionItem>
+          </>
+        )}
       </Accordion>
     </ThemedView>
   );

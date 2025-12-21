@@ -6,6 +6,7 @@ import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
 import { Colors } from '@/constants/theme';
+import { SubscriptionProvider } from '@/features/subscription';
 import '@/global.css';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { PreferencesProvider } from '@/hooks/use-preferences';
@@ -42,7 +43,9 @@ function RootLayoutContent() {
 export default function RootLayout() {
   return (
     <PreferencesProvider>
-      <RootLayoutContent />
+      <SubscriptionProvider>
+        <RootLayoutContent />
+      </SubscriptionProvider>
     </PreferencesProvider>
   );
 }
